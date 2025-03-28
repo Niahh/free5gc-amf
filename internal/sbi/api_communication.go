@@ -319,6 +319,7 @@ func (s *Server) HTTPUEContextTransfer(c *gin.Context) {
 			Detail: err.Error(),
 			Cause:  "SYSTEM_FAILURE",
 		}
+		
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
