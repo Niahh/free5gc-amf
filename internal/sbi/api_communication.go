@@ -309,7 +309,7 @@ func (s *Server) HTTPReleaseUEContext(c *gin.Context) {
 func (s *Server) HTTPUEContextTransfer(c *gin.Context) {
 	var ueContextTransferRequest models.UeContextTransferRequest
 	ueContextTransferRequest.JsonData = new(models.UeContextTransferReqData)
-
+ 
 	requestBody, err := c.GetRawData()
 	if err != nil {
 		logger.CommLog.Errorf("Get Request Body error: %+v", err)
@@ -319,7 +319,6 @@ func (s *Server) HTTPUEContextTransfer(c *gin.Context) {
 			Detail: err.Error(),
 			Cause:  "SYSTEM_FAILURE",
 		}
-		
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}

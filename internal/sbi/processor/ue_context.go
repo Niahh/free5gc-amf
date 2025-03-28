@@ -4,13 +4,16 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/free5gc/amf/internal/context"
 	gmm_common "github.com/free5gc/amf/internal/gmm/common"
 	"github.com/free5gc/amf/internal/logger"
+	"github.com/free5gc/amf/internal/metrics"
 	"github.com/free5gc/amf/internal/nas/nas_security"
 	"github.com/free5gc/nas/security"
 	"github.com/free5gc/openapi/models"
@@ -222,8 +225,10 @@ func (p *Processor) HandleUEContextTransferRequest(c *gin.Context,
 
 	ueContextTransferResponse, problemDetails := p.UEContextTransferProcedure(ueContextID, ueContextTransferRequest)
 	if problemDetails != nil {
+		metrics.UEContextTransferCounter.With(prometheus.Labels{"StatusCode": strconv.Itoa(int(problemDetails.Status))}).Inc()
 		c.JSON(int(problemDetails.Status), problemDetails)
 	} else {
+		metrics.UEContextTransferCounter.With(prometheus.Labels{"StatusCode": strconv.Itoa(http.StatusOK)}).Inc()
 		c.JSON(http.StatusOK, ueContextTransferResponse)
 	}
 }

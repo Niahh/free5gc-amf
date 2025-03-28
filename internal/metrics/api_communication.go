@@ -3,37 +3,25 @@ package metrics
 import "github.com/prometheus/client_golang/prometheus"
 
 const (
-	UEContextTransferSuccessfulCounterName = "communication_ue_context_transfer_success_total"
-	UEContextTransferErrorCounterName = "communication_ue_context_transfer_error_total"
+	UEContextTransferCounterName = "communication_ue_context_transfer_handled_total"
 )
 
 var (
-	UEContextTransferSuccessfulCounter prometheus.Counter
-	UEContextTransferErrorCounter prometheus.CounterVec
+	UEContextTransferCounter prometheus.CounterVec
 )
 
 func GetCommunicationServiceMetrics(namespace string) []prometheus.Collector {
 	var metrics []prometheus.Collector
 
-	UEContextTransferSuccessfulCounter = prometheus.NewCounter(
+	UEContextTransferCounter = *prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: namespace,
-			Name: UEContextTransferSuccessfulCounterName,
-			Help: "Show the number of successful UEContextTransfer this AMF has done",
-		},
+			Name: UEContextTransferCounterName,
+			Help: "Show the total number of UEContextTransfer calls handled by the AMF, could be filtered by StatusCode",
+		}, []string{"StatusCode"},
 	)
 
-	metrics = append(metrics, UEContextTransferSuccessfulCounter)
-
-	UEContextTransferErrorCounter = *prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Namespace: namespace,
-			Name: UEContextTransferErrorCounterName,
-			Help: "Show the number of UEContextTransfer this AMF could not carried out due to errors",
-		}, []string{"code"},
-	)
-
-	metrics = append(metrics, UEContextTransferErrorCounter)
+	metrics = append(metrics, UEContextTransferCounter)
 
 	return metrics
 }
