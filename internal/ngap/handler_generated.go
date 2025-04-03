@@ -4,9 +4,11 @@ package ngap
 import (
 	"github.com/free5gc/amf/internal/context"
 	"github.com/free5gc/amf/internal/logger"
+	metrics "github.com/free5gc/amf/internal/metrics/ngap"
 	ngap_message "github.com/free5gc/amf/internal/ngap/message"
 	"github.com/free5gc/ngap"
 	"github.com/free5gc/ngap/ngapType"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func handlerAMFConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingMessage) {
@@ -20,6 +22,19 @@ func handlerAMFConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapT
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdate", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	aMFConfigurationUpdate := initiatingMessage.Value.AMFConfigurationUpdate
@@ -166,6 +181,8 @@ func handlerAMFConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapT
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleAMFConfigurationUpdateMain(ran *context.AmfRan,
 	//	aMFName *ngapType.AMFName,
 	//	servedGUAMIList *ngapType.ServedGUAMIList,
@@ -199,6 +216,19 @@ func handlerAMFConfigurationUpdateAcknowledge(ran *context.AmfRan, successfulOut
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdateAcknowledge", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	aMFConfigurationUpdateAcknowledge := successfulOutcome.Value.AMFConfigurationUpdateAcknowledge
@@ -273,6 +303,8 @@ func handlerAMFConfigurationUpdateAcknowledge(ran *context.AmfRan, successfulOut
 		ran.Log.Warn("IE TNLAssociationList is not implemented")
 	}
 
+	metricStatusOk = true
+
 	// func handleAMFConfigurationUpdateAcknowledgeMain(ran *context.AmfRan,
 	//	criticalityDiagnostics *ngapType.CriticalityDiagnostics) {
 	handleAMFConfigurationUpdateAcknowledgeMain(ran, criticalityDiagnostics /* may be nil */)
@@ -285,6 +317,19 @@ func handlerAMFConfigurationUpdateFailure(ran *context.AmfRan, unsuccessfulOutco
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdateFailure", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	aMFConfigurationUpdateFailure := unsuccessfulOutcome.Value.AMFConfigurationUpdateFailure
@@ -359,6 +404,8 @@ func handlerAMFConfigurationUpdateFailure(ran *context.AmfRan, unsuccessfulOutco
 		ran.Log.Warn("IE TimeToWait is not implemented")
 	}
 
+	metricStatusOk = true
+
 	// func handleAMFConfigurationUpdateFailureMain(ran *context.AmfRan,
 	//	cause *ngapType.Cause,
 	//	criticalityDiagnostics *ngapType.CriticalityDiagnostics) {
@@ -370,6 +417,19 @@ func handlerAMFStatusIndication(ran *context.AmfRan, initiatingMessage *ngapType
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "AMFStatusIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	aMFStatusIndication := initiatingMessage.Value.AMFStatusIndication
@@ -444,6 +504,8 @@ func handlerAMFStatusIndication(ran *context.AmfRan, initiatingMessage *ngapType
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleAMFStatusIndicationMain(ran *context.AmfRan,
 	//	unavailableGUAMIList *ngapType.UnavailableGUAMIList) {
 	handleAMFStatusIndicationMain(ran, unavailableGUAMIList)
@@ -473,6 +535,19 @@ func handlerCellTrafficTrace(ran *context.AmfRan, initiatingMessage *ngapType.In
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "CellTrafficTrace", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	cellTrafficTrace := initiatingMessage.Value.CellTrafficTrace
@@ -637,6 +712,8 @@ func handlerCellTrafficTrace(ran *context.AmfRan, initiatingMessage *ngapType.In
 	}
 	ranUe.Log.Infof("Handle CellTrafficTrace (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleCellTrafficTraceMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	nGRANTraceID *ngapType.NGRANTraceID,
@@ -652,6 +729,19 @@ func handlerDeactivateTrace(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DeactivateTrace", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	deactivateTrace := initiatingMessage.Value.DeactivateTrace
@@ -782,6 +872,8 @@ func handlerDeactivateTrace(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 	}
 	ranUe.Log.Infof("Handle DeactivateTrace (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleDeactivateTraceMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	nGRANTraceID *ngapType.NGRANTraceID) {
@@ -816,6 +908,19 @@ func handlerDownlinkNASTransport(ran *context.AmfRan, initiatingMessage *ngapTyp
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkNASTransport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	downlinkNASTransport := initiatingMessage.Value.DownlinkNASTransport
@@ -1037,6 +1142,8 @@ func handlerDownlinkNASTransport(ran *context.AmfRan, initiatingMessage *ngapTyp
 	}
 	ranUe.Log.Infof("Handle DownlinkNASTransport (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleDownlinkNASTransportMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	oldAMF *ngapType.AMFName,
@@ -1070,6 +1177,19 @@ func handlerDownlinkNonUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatin
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkNonUEAssociatedNRPPaTransport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	downlinkNonUEAssociatedNRPPaTransport := initiatingMessage.Value.DownlinkNonUEAssociatedNRPPaTransport
@@ -1168,6 +1288,8 @@ func handlerDownlinkNonUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatin
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleDownlinkNonUEAssociatedNRPPaTransportMain(ran *context.AmfRan,
 	//	routingID *ngapType.RoutingID,
 	//	nRPPaPDU *ngapType.NRPPaPDU) {
@@ -1195,6 +1317,19 @@ func handlerDownlinkRANConfigurationTransfer(ran *context.AmfRan, initiatingMess
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkRANConfigurationTransfer", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	downlinkRANConfigurationTransfer := initiatingMessage.Value.DownlinkRANConfigurationTransfer
@@ -1271,6 +1406,8 @@ func handlerDownlinkRANConfigurationTransfer(ran *context.AmfRan, initiatingMess
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleDownlinkRANConfigurationTransferMain(ran *context.AmfRan,
 	//	sONConfigurationTransferDL *ngapType.SONConfigurationTransfer,
 	//	eNDCSONConfigurationTransferDL *ngapType.ENDCSONConfigurationTransfer) {
@@ -1299,6 +1436,19 @@ func handlerDownlinkRANStatusTransfer(ran *context.AmfRan, initiatingMessage *ng
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkRANStatusTransfer", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	downlinkRANStatusTransfer := initiatingMessage.Value.DownlinkRANStatusTransfer
@@ -1436,6 +1586,8 @@ func handlerDownlinkRANStatusTransfer(ran *context.AmfRan, initiatingMessage *ng
 	}
 	ranUe.Log.Infof("Handle DownlinkRANStatusTransfer (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleDownlinkRANStatusTransferMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	rANStatusTransferTransparentContainer *ngapType.RANStatusTransferTransparentContainer) {
@@ -1465,6 +1617,19 @@ func handlerDownlinkUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingMe
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkUEAssociatedNRPPaTransport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	downlinkUEAssociatedNRPPaTransport := initiatingMessage.Value.DownlinkUEAssociatedNRPPaTransport
@@ -1626,6 +1791,8 @@ func handlerDownlinkUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingMe
 	}
 	ranUe.Log.Infof("Handle DownlinkUEAssociatedNRPPaTransport (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleDownlinkUEAssociatedNRPPaTransportMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	routingID *ngapType.RoutingID,
@@ -1656,6 +1823,19 @@ func handlerErrorIndication(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "ErrorIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	errorIndication := initiatingMessage.Value.ErrorIndication
@@ -1731,6 +1911,8 @@ func handlerErrorIndication(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleErrorIndicationMain(ran *context.AmfRan,
 	//	aMFUENGAPID *ngapType.AMFUENGAPID,
 	//	rANUENGAPID *ngapType.RANUENGAPID,
@@ -1746,6 +1928,19 @@ func handlerHandoverCancel(ran *context.AmfRan, initiatingMessage *ngapType.Init
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverCancel", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverCancel := initiatingMessage.Value.HandoverCancel
@@ -1876,6 +2071,8 @@ func handlerHandoverCancel(ran *context.AmfRan, initiatingMessage *ngapType.Init
 	}
 	ranUe.Log.Infof("Handle HandoverCancel (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleHandoverCancelMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	cause *ngapType.Cause) {
@@ -1889,6 +2086,19 @@ func handlerHandoverCancelAcknowledge(ran *context.AmfRan, successfulOutcome *ng
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverCancelAcknowledge", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverCancelAcknowledge := successfulOutcome.Value.HandoverCancelAcknowledge
@@ -1980,6 +2190,8 @@ func handlerHandoverCancelAcknowledge(ran *context.AmfRan, successfulOutcome *ng
 		ranUe.Log.Infof("Handle HandoverCancelAcknowledge (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleHandoverCancelAcknowledgeMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	criticalityDiagnostics *ngapType.CriticalityDiagnostics) {
@@ -2002,6 +2214,19 @@ func handlerHandoverCommand(ran *context.AmfRan, successfulOutcome *ngapType.Suc
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverCommand", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverCommand := successfulOutcome.Value.HandoverCommand
@@ -2141,6 +2366,8 @@ func handlerHandoverCommand(ran *context.AmfRan, successfulOutcome *ngapType.Suc
 	}
 	ranUe.Log.Infof("Handle HandoverCommand (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleHandoverCommandMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	handoverType *ngapType.HandoverType,
@@ -2163,6 +2390,19 @@ func handlerHandoverFailure(ran *context.AmfRan, unsuccessfulOutcome *ngapType.U
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverFailure", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverFailure := unsuccessfulOutcome.Value.HandoverFailure
@@ -2253,6 +2493,8 @@ func handlerHandoverFailure(ran *context.AmfRan, unsuccessfulOutcome *ngapType.U
 		ranUe.Log.Infof("Handle HandoverFailure (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleHandoverFailureMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	cause *ngapType.Cause,
@@ -2267,6 +2509,19 @@ func handlerHandoverNotify(ran *context.AmfRan, initiatingMessage *ngapType.Init
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverNotify", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverNotify := initiatingMessage.Value.HandoverNotify
@@ -2397,6 +2652,8 @@ func handlerHandoverNotify(ran *context.AmfRan, initiatingMessage *ngapType.Init
 	}
 	ranUe.Log.Infof("Handle HandoverNotify (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleHandoverNotifyMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	userLocationInformation *ngapType.UserLocationInformation) {
@@ -2411,6 +2668,19 @@ func handlerHandoverPreparationFailure(ran *context.AmfRan, unsuccessfulOutcome 
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverPreparationFailure", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverPreparationFailure := unsuccessfulOutcome.Value.HandoverPreparationFailure
@@ -2513,6 +2783,8 @@ func handlerHandoverPreparationFailure(ran *context.AmfRan, unsuccessfulOutcome 
 		ranUe.Log.Infof("Handle HandoverPreparationFailure (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleHandoverPreparationFailureMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	cause *ngapType.Cause,
@@ -2547,6 +2819,19 @@ func handlerHandoverRequest(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverRequest := initiatingMessage.Value.HandoverRequest
@@ -2970,6 +3255,8 @@ func handlerHandoverRequest(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 	}
 	ranUe.Log.Infof("Handle HandoverRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleHandoverRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	handoverType *ngapType.HandoverType,
@@ -3018,6 +3305,19 @@ func handlerHandoverRequestAcknowledge(ran *context.AmfRan, successfulOutcome *n
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverRequestAcknowledge", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverRequestAcknowledge := successfulOutcome.Value.HandoverRequestAcknowledge
@@ -3140,6 +3440,8 @@ func handlerHandoverRequestAcknowledge(ran *context.AmfRan, successfulOutcome *n
 		ranUe.Log.Infof("Handle HandoverRequestAcknowledge (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleHandoverRequestAcknowledgeMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	rANUENGAPID *ngapType.RANUENGAPID,
@@ -3162,6 +3464,19 @@ func handlerHandoverRequired(ran *context.AmfRan, initiatingMessage *ngapType.In
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverRequired", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	handoverRequired := initiatingMessage.Value.HandoverRequired
@@ -3417,6 +3732,8 @@ func handlerHandoverRequired(ran *context.AmfRan, initiatingMessage *ngapType.In
 	}
 	ranUe.Log.Infof("Handle HandoverRequired (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleHandoverRequiredMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	handoverType *ngapType.HandoverType,
@@ -3436,6 +3753,19 @@ func handlerInitialContextSetupFailure(ran *context.AmfRan, unsuccessfulOutcome 
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "InitialContextSetupFailure", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	initialContextSetupFailure := unsuccessfulOutcome.Value.InitialContextSetupFailure
@@ -3546,6 +3876,8 @@ func handlerInitialContextSetupFailure(ran *context.AmfRan, unsuccessfulOutcome 
 		ranUe.Log.Infof("Handle InitialContextSetupFailure (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleInitialContextSetupFailureMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceFailedToSetupListCxtFail *ngapType.PDUSessionResourceFailedToSetupListCxtFail,
@@ -3578,6 +3910,19 @@ func handlerInitialContextSetupRequest(ran *context.AmfRan, initiatingMessage *n
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "InitialContextSetupRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	initialContextSetupRequest := initiatingMessage.Value.InitialContextSetupRequest
@@ -3983,6 +4328,8 @@ func handlerInitialContextSetupRequest(ran *context.AmfRan, initiatingMessage *n
 	}
 	ranUe.Log.Infof("Handle InitialContextSetupRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleInitialContextSetupRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	oldAMF *ngapType.AMFName,
@@ -4030,6 +4377,19 @@ func handlerInitialContextSetupResponse(ran *context.AmfRan, successfulOutcome *
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "InitialContextSetupResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	initialContextSetupResponse := successfulOutcome.Value.InitialContextSetupResponse
@@ -4137,6 +4497,8 @@ func handlerInitialContextSetupResponse(ran *context.AmfRan, successfulOutcome *
 		ranUe.Log.Infof("Handle InitialContextSetupResponse (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleInitialContextSetupResponseMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceSetupListCxtRes *ngapType.PDUSessionResourceSetupListCxtRes,
@@ -4157,6 +4519,19 @@ func handlerInitialUEMessage(ran *context.AmfRan, message *ngapType.NGAPPDU, ini
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "InitialUEMessage", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	initialUEMessage := initiatingMessage.Value.InitialUEMessage
@@ -4358,6 +4733,8 @@ func handlerInitialUEMessage(ran *context.AmfRan, message *ngapType.NGAPPDU, ini
 		ran.Log.Warn("IE AllowedNSSAI is not implemented")
 	}
 
+	metricStatusOk = true
+
 	// func handleInitialUEMessageMain(ran *context.AmfRan,
 	//	message *ngapType.NGAPPDU,
 	//	rANUENGAPID *ngapType.RANUENGAPID,
@@ -4378,6 +4755,19 @@ func handlerLocationReport(ran *context.AmfRan, initiatingMessage *ngapType.Init
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "LocationReport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	locationReport := initiatingMessage.Value.LocationReport
@@ -4539,6 +4929,8 @@ func handlerLocationReport(ran *context.AmfRan, initiatingMessage *ngapType.Init
 	}
 	ranUe.Log.Infof("Handle LocationReport (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleLocationReportMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	userLocationInformation *ngapType.UserLocationInformation,
@@ -4554,6 +4946,19 @@ func handlerLocationReportingControl(ran *context.AmfRan, initiatingMessage *nga
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "LocationReportingControl", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	locationReportingControl := initiatingMessage.Value.LocationReportingControl
@@ -4684,6 +5089,8 @@ func handlerLocationReportingControl(ran *context.AmfRan, initiatingMessage *nga
 	}
 	ranUe.Log.Infof("Handle LocationReportingControl (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleLocationReportingControlMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	locationReportingRequestType *ngapType.LocationReportingRequestType) {
@@ -4712,6 +5119,19 @@ func handlerLocationReportingFailureIndication(ran *context.AmfRan, initiatingMe
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "LocationReportingFailureIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	locationReportingFailureIndication := initiatingMessage.Value.LocationReportingFailureIndication
@@ -4842,6 +5262,8 @@ func handlerLocationReportingFailureIndication(ran *context.AmfRan, initiatingMe
 	}
 	ranUe.Log.Infof("Handle LocationReportingFailureIndication (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleLocationReportingFailureIndicationMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	cause *ngapType.Cause) {
@@ -4856,6 +5278,19 @@ func handlerNASNonDeliveryIndication(ran *context.AmfRan, initiatingMessage *nga
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NASNonDeliveryIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	nASNonDeliveryIndication := initiatingMessage.Value.NASNonDeliveryIndication
@@ -5003,6 +5438,8 @@ func handlerNASNonDeliveryIndication(ran *context.AmfRan, initiatingMessage *nga
 	}
 	ranUe.Log.Infof("Handle NASNonDeliveryIndication (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleNASNonDeliveryIndicationMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	nASPDU *ngapType.NASPDU,
@@ -5016,6 +5453,19 @@ func handlerNGReset(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingM
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGReset", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	nGReset := initiatingMessage.Value.NGReset
@@ -5107,6 +5557,8 @@ func handlerNGReset(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingM
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleNGResetMain(ran *context.AmfRan,
 	//	cause *ngapType.Cause,
 	//	resetType *ngapType.ResetType) {
@@ -5119,6 +5571,19 @@ func handlerNGResetAcknowledge(ran *context.AmfRan, successfulOutcome *ngapType.
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGResetAcknowledge", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	nGResetAcknowledge := successfulOutcome.Value.NGResetAcknowledge
@@ -5178,6 +5643,8 @@ func handlerNGResetAcknowledge(ran *context.AmfRan, successfulOutcome *ngapType.
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleNGResetAcknowledgeMain(ran *context.AmfRan,
 	//	uEAssociatedLogicalNGConnectionList *ngapType.UEAssociatedLogicalNGConnectionList,
 	//	criticalityDiagnostics *ngapType.CriticalityDiagnostics) {
@@ -5191,6 +5658,19 @@ func handlerNGSetupFailure(ran *context.AmfRan, unsuccessfulOutcome *ngapType.Un
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGSetupFailure", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	nGSetupFailure := unsuccessfulOutcome.Value.NGSetupFailure
@@ -5262,6 +5742,8 @@ func handlerNGSetupFailure(ran *context.AmfRan, unsuccessfulOutcome *ngapType.Un
 		ran.Log.Warn("Missing IE Cause")
 	}
 
+	metricStatusOk = true
+
 	// func handleNGSetupFailureMain(ran *context.AmfRan,
 	//	cause *ngapType.Cause,
 	//	timeToWait *ngapType.TimeToWait,
@@ -5282,6 +5764,19 @@ func handlerNGSetupRequest(ran *context.AmfRan, initiatingMessage *ngapType.Init
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGSetupRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	nGSetupRequest := initiatingMessage.Value.NGSetupRequest
@@ -5436,6 +5931,8 @@ func handlerNGSetupRequest(ran *context.AmfRan, initiatingMessage *ngapType.Init
 		ran.Log.Warn("IE UERetentionInformation is not implemented")
 	}
 
+	metricStatusOk = true
+
 	// func handleNGSetupRequestMain(ran *context.AmfRan,
 	//	globalRANNodeID *ngapType.GlobalRANNodeID,
 	//	rANNodeName *ngapType.RANNodeName,
@@ -5454,6 +5951,19 @@ func handlerNGSetupResponse(ran *context.AmfRan, successfulOutcome *ngapType.Suc
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGSetupResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	nGSetupResponse := successfulOutcome.Value.NGSetupResponse
@@ -5561,6 +6071,8 @@ func handlerNGSetupResponse(ran *context.AmfRan, successfulOutcome *ngapType.Suc
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleNGSetupResponseMain(ran *context.AmfRan,
 	//	aMFName *ngapType.AMFName,
 	//	servedGUAMIList *ngapType.ServedGUAMIList,
@@ -5582,6 +6094,19 @@ func handlerOverloadStart(ran *context.AmfRan, initiatingMessage *ngapType.Initi
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "OverloadStart", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	overloadStart := initiatingMessage.Value.OverloadStart
@@ -5672,6 +6197,8 @@ func handlerOverloadStart(ran *context.AmfRan, initiatingMessage *ngapType.Initi
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleOverloadStartMain(ran *context.AmfRan,
 	//	aMFOverloadResponse *ngapType.OverloadResponse,
 	//	aMFTrafficLoadReductionIndication *ngapType.TrafficLoadReductionIndication,
@@ -5698,6 +6225,19 @@ func handlerOverloadStop(ran *context.AmfRan, initiatingMessage *ngapType.Initia
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "OverloadStop", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	overloadStop := initiatingMessage.Value.OverloadStop
@@ -5746,6 +6286,8 @@ func handlerOverloadStop(ran *context.AmfRan, initiatingMessage *ngapType.Initia
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleOverloadStopMain(ran *context.AmfRan) {
 	handleOverloadStopMain(ran)
 }
@@ -5774,6 +6316,19 @@ func handlerPDUSessionResourceModifyConfirm(ran *context.AmfRan, successfulOutco
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyConfirm", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceModifyConfirm := successfulOutcome.Value.PDUSessionResourceModifyConfirm
@@ -5881,6 +6436,8 @@ func handlerPDUSessionResourceModifyConfirm(ran *context.AmfRan, successfulOutco
 		ranUe.Log.Infof("Handle PDUSessionResourceModifyConfirm (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceModifyConfirmMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceModifyListModCfm *ngapType.PDUSessionResourceModifyListModCfm,
@@ -5900,6 +6457,19 @@ func handlerPDUSessionResourceModifyIndication(ran *context.AmfRan, initiatingMe
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceModifyIndication := initiatingMessage.Value.PDUSessionResourceModifyIndication
@@ -6037,6 +6607,8 @@ func handlerPDUSessionResourceModifyIndication(ran *context.AmfRan, initiatingMe
 	}
 	ranUe.Log.Infof("Handle PDUSessionResourceModifyIndication (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceModifyIndicationMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceModifyListModInd *ngapType.PDUSessionResourceModifyListModInd) {
@@ -6051,6 +6623,19 @@ func handlerPDUSessionResourceModifyRequest(ran *context.AmfRan, initiatingMessa
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceModifyRequest := initiatingMessage.Value.PDUSessionResourceModifyRequest
@@ -6202,6 +6787,8 @@ func handlerPDUSessionResourceModifyRequest(ran *context.AmfRan, initiatingMessa
 	}
 	ranUe.Log.Infof("Handle PDUSessionResourceModifyRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceModifyRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	rANPagingPriority *ngapType.RANPagingPriority,
@@ -6234,6 +6821,19 @@ func handlerPDUSessionResourceModifyResponse(ran *context.AmfRan, successfulOutc
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceModifyResponse := successfulOutcome.Value.PDUSessionResourceModifyResponse
@@ -6349,6 +6949,8 @@ func handlerPDUSessionResourceModifyResponse(ran *context.AmfRan, successfulOutc
 		ranUe.Log.Infof("Handle PDUSessionResourceModifyResponse (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceModifyResponseMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceModifyListModRes *ngapType.PDUSessionResourceModifyListModRes,
@@ -6367,6 +6969,19 @@ func handlerPDUSessionResourceNotify(ran *context.AmfRan, initiatingMessage *nga
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceNotify", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceNotify := initiatingMessage.Value.PDUSessionResourceNotify
@@ -6522,6 +7137,8 @@ func handlerPDUSessionResourceNotify(ran *context.AmfRan, initiatingMessage *nga
 	}
 	ranUe.Log.Infof("Handle PDUSessionResourceNotify (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceNotifyMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceNotifyList *ngapType.PDUSessionResourceNotifyList,
@@ -6539,6 +7156,19 @@ func handlerPDUSessionResourceReleaseCommand(ran *context.AmfRan, initiatingMess
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceReleaseCommand", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceReleaseCommand := initiatingMessage.Value.PDUSessionResourceReleaseCommand
@@ -6704,6 +7334,8 @@ func handlerPDUSessionResourceReleaseCommand(ran *context.AmfRan, initiatingMess
 	}
 	ranUe.Log.Infof("Handle PDUSessionResourceReleaseCommand (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceReleaseCommandMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	rANPagingPriority *ngapType.RANPagingPriority,
@@ -6736,6 +7368,19 @@ func handlerPDUSessionResourceReleaseResponse(ran *context.AmfRan, successfulOut
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceReleaseResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceReleaseResponse := successfulOutcome.Value.PDUSessionResourceReleaseResponse
@@ -6846,6 +7491,8 @@ func handlerPDUSessionResourceReleaseResponse(ran *context.AmfRan, successfulOut
 		ranUe.Log.Infof("Handle PDUSessionResourceReleaseResponse (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceReleaseResponseMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceReleasedListRelRes *ngapType.PDUSessionResourceReleasedListRelRes,
@@ -6864,6 +7511,19 @@ func handlerPDUSessionResourceSetupRequest(ran *context.AmfRan, initiatingMessag
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceSetupRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceSetupRequest := initiatingMessage.Value.PDUSessionResourceSetupRequest
@@ -7043,6 +7703,8 @@ func handlerPDUSessionResourceSetupRequest(ran *context.AmfRan, initiatingMessag
 	}
 	ranUe.Log.Infof("Handle PDUSessionResourceSetupRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceSetupRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	rANPagingPriority *ngapType.RANPagingPriority,
@@ -7076,6 +7738,19 @@ func handlerPDUSessionResourceSetupResponse(ran *context.AmfRan, successfulOutco
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceSetupResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pDUSessionResourceSetupResponse := successfulOutcome.Value.PDUSessionResourceSetupResponse
@@ -7183,6 +7858,8 @@ func handlerPDUSessionResourceSetupResponse(ran *context.AmfRan, successfulOutco
 		ranUe.Log.Infof("Handle PDUSessionResourceSetupResponse (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handlePDUSessionResourceSetupResponseMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceSetupListSURes *ngapType.PDUSessionResourceSetupListSURes,
@@ -7199,6 +7876,19 @@ func handlerPWSCancelRequest(ran *context.AmfRan, initiatingMessage *ngapType.In
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PWSCancelRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pWSCancelRequest := initiatingMessage.Value.PWSCancelRequest
@@ -7325,6 +8015,8 @@ func handlerPWSCancelRequest(ran *context.AmfRan, initiatingMessage *ngapType.In
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handlePWSCancelRequestMain(ran *context.AmfRan,
 	//	messageIdentifier *ngapType.MessageIdentifier,
 	//	serialNumber *ngapType.SerialNumber,
@@ -7356,6 +8048,19 @@ func handlerPWSCancelResponse(ran *context.AmfRan, successfulOutcome *ngapType.S
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PWSCancelResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pWSCancelResponse := successfulOutcome.Value.PWSCancelResponse
@@ -7440,6 +8145,8 @@ func handlerPWSCancelResponse(ran *context.AmfRan, successfulOutcome *ngapType.S
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handlePWSCancelResponseMain(ran *context.AmfRan,
 	//	messageIdentifier *ngapType.MessageIdentifier,
 	//	serialNumber *ngapType.SerialNumber,
@@ -7458,6 +8165,19 @@ func handlerPWSFailureIndication(ran *context.AmfRan, initiatingMessage *ngapTyp
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PWSFailureIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pWSFailureIndication := initiatingMessage.Value.PWSFailureIndication
@@ -7556,6 +8276,8 @@ func handlerPWSFailureIndication(ran *context.AmfRan, initiatingMessage *ngapTyp
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handlePWSFailureIndicationMain(ran *context.AmfRan,
 	//	pWSFailedCellIDList *ngapType.PWSFailedCellIDList,
 	//	globalRANNodeID *ngapType.GlobalRANNodeID) {
@@ -7585,6 +8307,19 @@ func handlerPWSRestartIndication(ran *context.AmfRan, initiatingMessage *ngapTyp
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PWSRestartIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pWSRestartIndication := initiatingMessage.Value.PWSRestartIndication
@@ -7721,6 +8456,8 @@ func handlerPWSRestartIndication(ran *context.AmfRan, initiatingMessage *ngapTyp
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handlePWSRestartIndicationMain(ran *context.AmfRan,
 	//	cellIDListForRestart *ngapType.CellIDListForRestart,
 	//	globalRANNodeID *ngapType.GlobalRANNodeID,
@@ -7755,6 +8492,19 @@ func handlerPaging(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingMe
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "Paging", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	paging := initiatingMessage.Value.Paging
@@ -7908,6 +8658,8 @@ func handlerPaging(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingMe
 		ran.Log.Warn("Missing IE TAIListForPaging")
 	}
 
+	metricStatusOk = true
+
 	// func handlePagingMain(ran *context.AmfRan,
 	//	uEPagingIdentity *ngapType.UEPagingIdentity,
 	//	pagingDRX *ngapType.PagingDRX,
@@ -7944,6 +8696,19 @@ func handlerPathSwitchRequest(ran *context.AmfRan, initiatingMessage *ngapType.I
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PathSwitchRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pathSwitchRequest := initiatingMessage.Value.PathSwitchRequest
@@ -8114,6 +8879,8 @@ func handlerPathSwitchRequest(ran *context.AmfRan, initiatingMessage *ngapType.I
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handlePathSwitchRequestMain(ran *context.AmfRan,
 	//	rANUENGAPID *ngapType.RANUENGAPID,
 	//	sourceAMFUENGAPID *ngapType.AMFUENGAPID,
@@ -8140,6 +8907,19 @@ func handlerPathSwitchRequestAcknowledge(ran *context.AmfRan, successfulOutcome 
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PathSwitchRequestAcknowledge", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pathSwitchRequestAcknowledge := successfulOutcome.Value.PathSwitchRequestAcknowledge
@@ -8314,6 +9094,8 @@ func handlerPathSwitchRequestAcknowledge(ran *context.AmfRan, successfulOutcome 
 		ranUe.Log.Infof("Handle PathSwitchRequestAcknowledge (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handlePathSwitchRequestAcknowledgeMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	uESecurityCapabilities *ngapType.UESecurityCapabilities,
@@ -8341,6 +9123,19 @@ func handlerPathSwitchRequestFailure(ran *context.AmfRan, unsuccessfulOutcome *n
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PathSwitchRequestFailure", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	pathSwitchRequestFailure := unsuccessfulOutcome.Value.PathSwitchRequestFailure
@@ -8443,6 +9238,8 @@ func handlerPathSwitchRequestFailure(ran *context.AmfRan, unsuccessfulOutcome *n
 		ranUe.Log.Infof("Handle PathSwitchRequestFailure (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handlePathSwitchRequestFailureMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceReleasedListPSFail *ngapType.PDUSessionResourceReleasedListPSFail,
@@ -8462,6 +9259,19 @@ func handlerRANConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapT
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RANConfigurationUpdate", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	rANConfigurationUpdate := initiatingMessage.Value.RANConfigurationUpdate
@@ -8584,6 +9394,8 @@ func handlerRANConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapT
 		ran.Log.Warn("IE GlobalRANNodeID is not implemented")
 	}
 
+	metricStatusOk = true
+
 	// func handleRANConfigurationUpdateMain(ran *context.AmfRan,
 	//	supportedTAList *ngapType.SupportedTAList) {
 	handleRANConfigurationUpdateMain(ran, supportedTAList /* may be nil */)
@@ -8594,6 +9406,19 @@ func handlerRANConfigurationUpdateAcknowledge(ran *context.AmfRan, successfulOut
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RANConfigurationUpdateAcknowledge", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	rANConfigurationUpdateAcknowledge := successfulOutcome.Value.RANConfigurationUpdateAcknowledge
@@ -8645,6 +9470,8 @@ func handlerRANConfigurationUpdateAcknowledge(ran *context.AmfRan, successfulOut
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleRANConfigurationUpdateAcknowledgeMain(ran *context.AmfRan,
 	//	criticalityDiagnostics *ngapType.CriticalityDiagnostics) {
 	handleRANConfigurationUpdateAcknowledgeMain(ran, criticalityDiagnostics /* may be nil */)
@@ -8661,6 +9488,19 @@ func handlerRANConfigurationUpdateFailure(ran *context.AmfRan, unsuccessfulOutco
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RANConfigurationUpdateFailure", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	rANConfigurationUpdateFailure := unsuccessfulOutcome.Value.RANConfigurationUpdateFailure
@@ -8732,6 +9572,8 @@ func handlerRANConfigurationUpdateFailure(ran *context.AmfRan, unsuccessfulOutco
 		ran.Log.Warn("Missing IE Cause")
 	}
 
+	metricStatusOk = true
+
 	// func handleRANConfigurationUpdateFailureMain(ran *context.AmfRan,
 	//	cause *ngapType.Cause,
 	//	timeToWait *ngapType.TimeToWait,
@@ -8751,6 +9593,19 @@ func handlerRRCInactiveTransitionReport(ran *context.AmfRan, initiatingMessage *
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RRCInactiveTransitionReport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	rRCInactiveTransitionReport := initiatingMessage.Value.RRCInactiveTransitionReport
@@ -8898,6 +9753,8 @@ func handlerRRCInactiveTransitionReport(ran *context.AmfRan, initiatingMessage *
 	}
 	ranUe.Log.Infof("Handle RRCInactiveTransitionReport (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleRRCInactiveTransitionReportMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	rRCState *ngapType.RRCState,
@@ -8913,6 +9770,19 @@ func handlerRerouteNASRequest(ran *context.AmfRan, initiatingMessage *ngapType.I
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RerouteNASRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	rerouteNASRequest := initiatingMessage.Value.RerouteNASRequest
@@ -9056,6 +9926,8 @@ func handlerRerouteNASRequest(ran *context.AmfRan, initiatingMessage *ngapType.I
 		ranUe.Log.Infof("Handle RerouteNASRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleRerouteNASRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	aMFSetID *ngapType.AMFSetID,
@@ -9086,6 +9958,19 @@ func handlerSecondaryRATDataUsageReport(ran *context.AmfRan, initiatingMessage *
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "SecondaryRATDataUsageReport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	secondaryRATDataUsageReport := initiatingMessage.Value.SecondaryRATDataUsageReport
@@ -9217,6 +10102,8 @@ func handlerSecondaryRATDataUsageReport(ran *context.AmfRan, initiatingMessage *
 		ranUe.Log.Infof("Handle SecondaryRATDataUsageReport (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleSecondaryRATDataUsageReportMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceSecondaryRATUsageList *ngapType.PDUSessionResourceSecondaryRATUsageList,
@@ -9247,6 +10134,19 @@ func handlerTraceFailureIndication(ran *context.AmfRan, initiatingMessage *ngapT
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "TraceFailureIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	traceFailureIndication := initiatingMessage.Value.TraceFailureIndication
@@ -9394,6 +10294,8 @@ func handlerTraceFailureIndication(ran *context.AmfRan, initiatingMessage *ngapT
 	}
 	ranUe.Log.Infof("Handle TraceFailureIndication (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleTraceFailureIndicationMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	nGRANTraceID *ngapType.NGRANTraceID,
@@ -9423,6 +10325,19 @@ func handlerTraceStart(ran *context.AmfRan, initiatingMessage *ngapType.Initiati
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "TraceStart", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	traceStart := initiatingMessage.Value.TraceStart
@@ -9553,6 +10468,8 @@ func handlerTraceStart(ran *context.AmfRan, initiatingMessage *ngapType.Initiati
 	}
 	ranUe.Log.Infof("Handle TraceStart (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleTraceStartMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	traceActivation *ngapType.TraceActivation) {
@@ -9582,6 +10499,19 @@ func handlerUEContextModificationFailure(ran *context.AmfRan, unsuccessfulOutcom
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextModificationFailure", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uEContextModificationFailure := unsuccessfulOutcome.Value.UEContextModificationFailure
@@ -9684,6 +10614,8 @@ func handlerUEContextModificationFailure(ran *context.AmfRan, unsuccessfulOutcom
 		ranUe.Log.Infof("Handle UEContextModificationFailure (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleUEContextModificationFailureMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	cause *ngapType.Cause,
@@ -9706,6 +10638,19 @@ func handlerUEContextModificationRequest(ran *context.AmfRan, initiatingMessage 
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextModificationRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uEContextModificationRequest := initiatingMessage.Value.UEContextModificationRequest
@@ -9945,6 +10890,8 @@ func handlerUEContextModificationRequest(ran *context.AmfRan, initiatingMessage 
 	}
 	ranUe.Log.Infof("Handle UEContextModificationRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleUEContextModificationRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	rANPagingPriority *ngapType.RANPagingPriority,
@@ -9983,6 +10930,19 @@ func handlerUEContextModificationResponse(ran *context.AmfRan, successfulOutcome
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextModificationResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uEContextModificationResponse := successfulOutcome.Value.UEContextModificationResponse
@@ -10090,6 +11050,8 @@ func handlerUEContextModificationResponse(ran *context.AmfRan, successfulOutcome
 		ranUe.Log.Infof("Handle UEContextModificationResponse (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleUEContextModificationResponseMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	rRCState *ngapType.RRCState,
@@ -10104,6 +11066,19 @@ func handlerUEContextReleaseCommand(ran *context.AmfRan, initiatingMessage *ngap
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextReleaseCommand", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uEContextReleaseCommand := initiatingMessage.Value.UEContextReleaseCommand
@@ -10195,6 +11170,8 @@ func handlerUEContextReleaseCommand(ran *context.AmfRan, initiatingMessage *ngap
 		ran.Log.Warn("Missing IE Cause")
 	}
 
+	metricStatusOk = true
+
 	// func handleUEContextReleaseCommandMain(ran *context.AmfRan,
 	//	uENGAPIDs *ngapType.UENGAPIDs,
 	//	cause *ngapType.Cause) {
@@ -10226,6 +11203,19 @@ func handlerUEContextReleaseComplete(ran *context.AmfRan, successfulOutcome *nga
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextReleaseComplete", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uEContextReleaseComplete := successfulOutcome.Value.UEContextReleaseComplete
@@ -10341,6 +11331,8 @@ func handlerUEContextReleaseComplete(ran *context.AmfRan, successfulOutcome *nga
 		ranUe.Log.Infof("Handle UEContextReleaseComplete (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleUEContextReleaseCompleteMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	userLocationInformation *ngapType.UserLocationInformation,
@@ -10358,6 +11350,19 @@ func handlerUEContextReleaseRequest(ran *context.AmfRan, initiatingMessage *ngap
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextReleaseRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uEContextReleaseRequest := initiatingMessage.Value.UEContextReleaseRequest
@@ -10502,6 +11507,8 @@ func handlerUEContextReleaseRequest(ran *context.AmfRan, initiatingMessage *ngap
 	}
 	ranUe.Log.Infof("Handle UEContextReleaseRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleUEContextReleaseRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	pDUSessionResourceListCxtRelReq *ngapType.PDUSessionResourceListCxtRelReq,
@@ -10516,6 +11523,19 @@ func handlerUERadioCapabilityCheckRequest(ran *context.AmfRan, initiatingMessage
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UERadioCapabilityCheckRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uERadioCapabilityCheckRequest := initiatingMessage.Value.UERadioCapabilityCheckRequest
@@ -10643,6 +11663,8 @@ func handlerUERadioCapabilityCheckRequest(ran *context.AmfRan, initiatingMessage
 	}
 	ranUe.Log.Infof("Handle UERadioCapabilityCheckRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleUERadioCapabilityCheckRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	uERadioCapability *ngapType.UERadioCapability) {
@@ -10672,6 +11694,19 @@ func handlerUERadioCapabilityCheckResponse(ran *context.AmfRan, successfulOutcom
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UERadioCapabilityCheckResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uERadioCapabilityCheckResponse := successfulOutcome.Value.UERadioCapabilityCheckResponse
@@ -10778,6 +11813,8 @@ func handlerUERadioCapabilityCheckResponse(ran *context.AmfRan, successfulOutcom
 		ranUe.Log.Infof("Handle UERadioCapabilityCheckResponse (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 	}
 
+	metricStatusOk = true
+
 	// func handleUERadioCapabilityCheckResponseMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	criticalityDiagnostics *ngapType.CriticalityDiagnostics) {
@@ -10792,6 +11829,19 @@ func handlerUERadioCapabilityInfoIndication(ran *context.AmfRan, initiatingMessa
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UERadioCapabilityInfoIndication", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uERadioCapabilityInfoIndication := initiatingMessage.Value.UERadioCapabilityInfoIndication
@@ -10936,6 +11986,8 @@ func handlerUERadioCapabilityInfoIndication(ran *context.AmfRan, initiatingMessa
 	}
 	ranUe.Log.Infof("Handle UERadioCapabilityInfoIndication (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleUERadioCapabilityInfoIndicationMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	uERadioCapability *ngapType.UERadioCapability,
@@ -10949,6 +12001,19 @@ func handlerUETNLABindingReleaseRequest(ran *context.AmfRan, initiatingMessage *
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UETNLABindingReleaseRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uETNLABindingReleaseRequest := initiatingMessage.Value.UETNLABindingReleaseRequest
@@ -11062,6 +12127,8 @@ func handlerUETNLABindingReleaseRequest(ran *context.AmfRan, initiatingMessage *
 	}
 	ranUe.Log.Infof("Handle UETNLABindingReleaseRequest (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleUETNLABindingReleaseRequestMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe) {
 	handleUETNLABindingReleaseRequestMain(ran, ranUe)
@@ -11090,6 +12157,19 @@ func handlerUplinkNASTransport(ran *context.AmfRan, initiatingMessage *ngapType.
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkNASTransport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uplinkNASTransport := initiatingMessage.Value.UplinkNASTransport
@@ -11244,6 +12324,8 @@ func handlerUplinkNASTransport(ran *context.AmfRan, initiatingMessage *ngapType.
 	}
 	ranUe.Log.Infof("Handle UplinkNASTransport (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleUplinkNASTransportMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	nASPDU *ngapType.NASPDU,
@@ -11257,6 +12339,19 @@ func handlerUplinkNonUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingM
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkNonUEAssociatedNRPPaTransport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uplinkNonUEAssociatedNRPPaTransport := initiatingMessage.Value.UplinkNonUEAssociatedNRPPaTransport
@@ -11355,6 +12450,8 @@ func handlerUplinkNonUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingM
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleUplinkNonUEAssociatedNRPPaTransportMain(ran *context.AmfRan,
 	//	routingID *ngapType.RoutingID,
 	//	nRPPaPDU *ngapType.NRPPaPDU) {
@@ -11367,6 +12464,19 @@ func handlerUplinkRANConfigurationTransfer(ran *context.AmfRan, initiatingMessag
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkRANConfigurationTransfer", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uplinkRANConfigurationTransfer := initiatingMessage.Value.UplinkRANConfigurationTransfer
@@ -11447,6 +12557,8 @@ func handlerUplinkRANConfigurationTransfer(ran *context.AmfRan, initiatingMessag
 		ran.Log.Warn("IE EN-DCSONConfigurationTransfer is not implemented")
 	}
 
+	metricStatusOk = true
+
 	// func handleUplinkRANConfigurationTransferMain(ran *context.AmfRan,
 	//	sONConfigurationTransferUL *ngapType.SONConfigurationTransfer) {
 	handleUplinkRANConfigurationTransferMain(ran, sONConfigurationTransferUL /* may be nil */)
@@ -11459,6 +12571,19 @@ func handlerUplinkRANStatusTransfer(ran *context.AmfRan, initiatingMessage *ngap
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkRANStatusTransfer", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uplinkRANStatusTransfer := initiatingMessage.Value.UplinkRANStatusTransfer
@@ -11599,6 +12724,8 @@ func handlerUplinkRANStatusTransfer(ran *context.AmfRan, initiatingMessage *ngap
 	}
 	ranUe.Log.Infof("Handle UplinkRANStatusTransfer (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleUplinkRANStatusTransferMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe) {
 	handleUplinkRANStatusTransferMain(ran, ranUe)
@@ -11612,6 +12739,19 @@ func handlerUplinkUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingMess
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkUEAssociatedNRPPaTransport", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	uplinkUEAssociatedNRPPaTransport := initiatingMessage.Value.UplinkUEAssociatedNRPPaTransport
@@ -11776,6 +12916,8 @@ func handlerUplinkUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingMess
 	}
 	ranUe.Log.Infof("Handle UplinkUEAssociatedNRPPaTransport (RAN UE NGAP ID: %d)", ranUe.RanUeNgapId)
 
+	metricStatusOk = true
+
 	// func handleUplinkUEAssociatedNRPPaTransportMain(ran *context.AmfRan,
 	//	ranUe *context.RanUe,
 	//	routingID *ngapType.RoutingID) {
@@ -11797,6 +12939,19 @@ func handlerWriteReplaceWarningRequest(ran *context.AmfRan, initiatingMessage *n
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "WriteReplaceWarningRequest", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	writeReplaceWarningRequest := initiatingMessage.Value.WriteReplaceWarningRequest
@@ -12041,6 +13196,8 @@ func handlerWriteReplaceWarningRequest(ran *context.AmfRan, initiatingMessage *n
 		return
 	}
 
+	metricStatusOk = true
+
 	// func handleWriteReplaceWarningRequestMain(ran *context.AmfRan,
 	//	messageIdentifier *ngapType.MessageIdentifier,
 	//	serialNumber *ngapType.SerialNumber,
@@ -12079,6 +13236,19 @@ func handlerWriteReplaceWarningResponse(ran *context.AmfRan, successfulOutcome *
 
 	var syntaxCause *ngapType.Cause
 	var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList
+
+	metricStatusOk := false
+
+	defer func() {
+		status := "error"
+
+		if metricStatusOk {
+			status = "success"
+		}
+
+		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "WriteReplaceWarningResponse", "status": status}).Add(1)
+	}()
+
 	abort := false
 
 	writeReplaceWarningResponse := successfulOutcome.Value.WriteReplaceWarningResponse
@@ -12162,6 +13332,8 @@ func handlerWriteReplaceWarningResponse(ran *context.AmfRan, successfulOutcome *
 		ran.Log.Error("Missing IE SerialNumber")
 		return
 	}
+
+	metricStatusOk = true
 
 	// func handleWriteReplaceWarningResponseMain(ran *context.AmfRan,
 	//	messageIdentifier *ngapType.MessageIdentifier,

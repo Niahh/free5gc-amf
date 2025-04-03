@@ -29,7 +29,7 @@ const (
 	AmfMetricsDefaultIPv4     = "127.0.0.18"
 	AmfMetricsDefaultPort     = 9091
 	AmfMetricsDefaultScheme   = "https"
-	AmfMetricsDefaultNamespace   = "free5GCAmf"
+	AmfMetricsDefaultNamespace   = "free5gc_amf"
 	AmfDefaultNrfUri          = "https://127.0.0.10:8000"
 	sctpDefaultNumOstreams    = 3
 	sctpDefaultMaxInstreams   = 5

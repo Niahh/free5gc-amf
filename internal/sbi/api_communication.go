@@ -322,7 +322,6 @@ func (s *Server) HTTPUEContextTransfer(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
-
 	contentType := c.GetHeader("Content-Type")
 	str := strings.Split(contentType, ";")
 	switch str[0] {

@@ -2,6 +2,8 @@
 package metrics
 
 import (
+	"github.com/free5gc/amf/internal/metrics/ngap"
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"github.com/free5gc/amf/pkg/factory"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
@@ -16,7 +18,9 @@ func Init(cfg *factory.Config) *prometheus.Registry{
 
 	var amfMetrics []prometheus.Collector
 
-	amfMetrics = append(amfMetrics, GetCommunicationServiceMetrics(namespace)...)
+	amfMetrics = append(amfMetrics, sbi.GetCommunicationServiceMetrics(namespace)...)
+	amfMetrics = append(amfMetrics, ngap.GetHandoverRequestCounter(namespace)...)
+	amfMetrics = append(amfMetrics, ngap.GetNgapHandlerMetrics(namespace)...)
 
 	initMetric(amfMetrics, reg)
 
