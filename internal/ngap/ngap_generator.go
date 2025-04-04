@@ -310,7 +310,7 @@ func generateHandler() {
 		fmt.Fprintln(fOut, "")
 		fmt.Fprintln(fOut, "var syntaxCause *ngapType.Cause")
 		fmt.Fprintln(fOut, "var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList")
-		
+
 		// Increase metric counter depending of the outcome of the handler generated function.
 		fmt.Fprintln(fOut, "")
 		fmt.Fprintln(fOut, "metricStatusOk := false")
@@ -322,7 +322,7 @@ func generateHandler() {
 		fmt.Fprintln(fOut, "status = \"success\"")
 		fmt.Fprintln(fOut, "}")
 		fmt.Fprintln(fOut, "")
-		fmt.Fprintf(fOut, "metrics.NgapMsgCounter.With(prometheus.Labels{\"name\" : \"%s\", \"status\" : status}).Add(1)", msgName)
+		fmt.Fprintf(fOut, "metrics.NgapMsgRcvCounter.With(prometheus.Labels{\"name\" : \"%s\", \"status\" : status}).Add(1)", msgName)
 		fmt.Fprintln(fOut, "")
 		fmt.Fprintln(fOut, "}()")
 		fmt.Fprintln(fOut, "")

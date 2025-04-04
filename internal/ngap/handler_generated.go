@@ -32,7 +32,7 @@ func handlerAMFConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapT
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdate", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdate", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -226,7 +226,7 @@ func handlerAMFConfigurationUpdateAcknowledge(ran *context.AmfRan, successfulOut
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdateAcknowledge", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdateAcknowledge", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -327,7 +327,7 @@ func handlerAMFConfigurationUpdateFailure(ran *context.AmfRan, unsuccessfulOutco
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdateFailure", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "AMFConfigurationUpdateFailure", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -427,7 +427,7 @@ func handlerAMFStatusIndication(ran *context.AmfRan, initiatingMessage *ngapType
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "AMFStatusIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "AMFStatusIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -545,7 +545,7 @@ func handlerCellTrafficTrace(ran *context.AmfRan, initiatingMessage *ngapType.In
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "CellTrafficTrace", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "CellTrafficTrace", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -739,7 +739,7 @@ func handlerDeactivateTrace(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DeactivateTrace", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "DeactivateTrace", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -918,7 +918,7 @@ func handlerDownlinkNASTransport(ran *context.AmfRan, initiatingMessage *ngapTyp
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkNASTransport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "DownlinkNASTransport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -1187,7 +1187,7 @@ func handlerDownlinkNonUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatin
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkNonUEAssociatedNRPPaTransport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "DownlinkNonUEAssociatedNRPPaTransport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -1327,7 +1327,7 @@ func handlerDownlinkRANConfigurationTransfer(ran *context.AmfRan, initiatingMess
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkRANConfigurationTransfer", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "DownlinkRANConfigurationTransfer", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -1446,7 +1446,7 @@ func handlerDownlinkRANStatusTransfer(ran *context.AmfRan, initiatingMessage *ng
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkRANStatusTransfer", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "DownlinkRANStatusTransfer", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -1627,7 +1627,7 @@ func handlerDownlinkUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingMe
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "DownlinkUEAssociatedNRPPaTransport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "DownlinkUEAssociatedNRPPaTransport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -1833,7 +1833,7 @@ func handlerErrorIndication(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "ErrorIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "ErrorIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -1938,7 +1938,7 @@ func handlerHandoverCancel(ran *context.AmfRan, initiatingMessage *ngapType.Init
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverCancel", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverCancel", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -2096,7 +2096,7 @@ func handlerHandoverCancelAcknowledge(ran *context.AmfRan, successfulOutcome *ng
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverCancelAcknowledge", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverCancelAcknowledge", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -2224,7 +2224,7 @@ func handlerHandoverCommand(ran *context.AmfRan, successfulOutcome *ngapType.Suc
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverCommand", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverCommand", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -2400,7 +2400,7 @@ func handlerHandoverFailure(ran *context.AmfRan, unsuccessfulOutcome *ngapType.U
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverFailure", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverFailure", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -2519,7 +2519,7 @@ func handlerHandoverNotify(ran *context.AmfRan, initiatingMessage *ngapType.Init
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverNotify", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverNotify", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -2678,7 +2678,7 @@ func handlerHandoverPreparationFailure(ran *context.AmfRan, unsuccessfulOutcome 
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverPreparationFailure", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverPreparationFailure", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -2829,7 +2829,7 @@ func handlerHandoverRequest(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -3315,7 +3315,7 @@ func handlerHandoverRequestAcknowledge(ran *context.AmfRan, successfulOutcome *n
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverRequestAcknowledge", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverRequestAcknowledge", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -3474,7 +3474,7 @@ func handlerHandoverRequired(ran *context.AmfRan, initiatingMessage *ngapType.In
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "HandoverRequired", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "HandoverRequired", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -3763,7 +3763,7 @@ func handlerInitialContextSetupFailure(ran *context.AmfRan, unsuccessfulOutcome 
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "InitialContextSetupFailure", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "InitialContextSetupFailure", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -3920,7 +3920,7 @@ func handlerInitialContextSetupRequest(ran *context.AmfRan, initiatingMessage *n
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "InitialContextSetupRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "InitialContextSetupRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -4387,7 +4387,7 @@ func handlerInitialContextSetupResponse(ran *context.AmfRan, successfulOutcome *
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "InitialContextSetupResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "InitialContextSetupResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -4529,7 +4529,7 @@ func handlerInitialUEMessage(ran *context.AmfRan, message *ngapType.NGAPPDU, ini
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "InitialUEMessage", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "InitialUEMessage", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -4765,7 +4765,7 @@ func handlerLocationReport(ran *context.AmfRan, initiatingMessage *ngapType.Init
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "LocationReport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "LocationReport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -4956,7 +4956,7 @@ func handlerLocationReportingControl(ran *context.AmfRan, initiatingMessage *nga
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "LocationReportingControl", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "LocationReportingControl", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -5129,7 +5129,7 @@ func handlerLocationReportingFailureIndication(ran *context.AmfRan, initiatingMe
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "LocationReportingFailureIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "LocationReportingFailureIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -5288,7 +5288,7 @@ func handlerNASNonDeliveryIndication(ran *context.AmfRan, initiatingMessage *nga
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NASNonDeliveryIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "NASNonDeliveryIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -5463,7 +5463,7 @@ func handlerNGReset(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingM
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGReset", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "NGReset", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -5581,7 +5581,7 @@ func handlerNGResetAcknowledge(ran *context.AmfRan, successfulOutcome *ngapType.
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGResetAcknowledge", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "NGResetAcknowledge", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -5668,7 +5668,7 @@ func handlerNGSetupFailure(ran *context.AmfRan, unsuccessfulOutcome *ngapType.Un
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGSetupFailure", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "NGSetupFailure", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -5774,7 +5774,7 @@ func handlerNGSetupRequest(ran *context.AmfRan, initiatingMessage *ngapType.Init
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGSetupRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "NGSetupRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -5961,7 +5961,7 @@ func handlerNGSetupResponse(ran *context.AmfRan, successfulOutcome *ngapType.Suc
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "NGSetupResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "NGSetupResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -6104,7 +6104,7 @@ func handlerOverloadStart(ran *context.AmfRan, initiatingMessage *ngapType.Initi
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "OverloadStart", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "OverloadStart", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -6235,7 +6235,7 @@ func handlerOverloadStop(ran *context.AmfRan, initiatingMessage *ngapType.Initia
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "OverloadStop", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "OverloadStop", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -6326,7 +6326,7 @@ func handlerPDUSessionResourceModifyConfirm(ran *context.AmfRan, successfulOutco
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyConfirm", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyConfirm", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -6467,7 +6467,7 @@ func handlerPDUSessionResourceModifyIndication(ran *context.AmfRan, initiatingMe
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -6633,7 +6633,7 @@ func handlerPDUSessionResourceModifyRequest(ran *context.AmfRan, initiatingMessa
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -6831,7 +6831,7 @@ func handlerPDUSessionResourceModifyResponse(ran *context.AmfRan, successfulOutc
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceModifyResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -6979,7 +6979,7 @@ func handlerPDUSessionResourceNotify(ran *context.AmfRan, initiatingMessage *nga
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceNotify", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceNotify", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -7166,7 +7166,7 @@ func handlerPDUSessionResourceReleaseCommand(ran *context.AmfRan, initiatingMess
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceReleaseCommand", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceReleaseCommand", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -7378,7 +7378,7 @@ func handlerPDUSessionResourceReleaseResponse(ran *context.AmfRan, successfulOut
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceReleaseResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceReleaseResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -7521,7 +7521,7 @@ func handlerPDUSessionResourceSetupRequest(ran *context.AmfRan, initiatingMessag
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceSetupRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceSetupRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -7748,7 +7748,7 @@ func handlerPDUSessionResourceSetupResponse(ran *context.AmfRan, successfulOutco
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PDUSessionResourceSetupResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PDUSessionResourceSetupResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -7886,7 +7886,7 @@ func handlerPWSCancelRequest(ran *context.AmfRan, initiatingMessage *ngapType.In
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PWSCancelRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PWSCancelRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -8058,7 +8058,7 @@ func handlerPWSCancelResponse(ran *context.AmfRan, successfulOutcome *ngapType.S
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PWSCancelResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PWSCancelResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -8175,7 +8175,7 @@ func handlerPWSFailureIndication(ran *context.AmfRan, initiatingMessage *ngapTyp
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PWSFailureIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PWSFailureIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -8317,7 +8317,7 @@ func handlerPWSRestartIndication(ran *context.AmfRan, initiatingMessage *ngapTyp
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PWSRestartIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PWSRestartIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -8502,7 +8502,7 @@ func handlerPaging(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingMe
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "Paging", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "Paging", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -8706,7 +8706,7 @@ func handlerPathSwitchRequest(ran *context.AmfRan, initiatingMessage *ngapType.I
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PathSwitchRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PathSwitchRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -8917,7 +8917,7 @@ func handlerPathSwitchRequestAcknowledge(ran *context.AmfRan, successfulOutcome 
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PathSwitchRequestAcknowledge", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PathSwitchRequestAcknowledge", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -9133,7 +9133,7 @@ func handlerPathSwitchRequestFailure(ran *context.AmfRan, unsuccessfulOutcome *n
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "PathSwitchRequestFailure", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "PathSwitchRequestFailure", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -9269,7 +9269,7 @@ func handlerRANConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapT
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RANConfigurationUpdate", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "RANConfigurationUpdate", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -9416,7 +9416,7 @@ func handlerRANConfigurationUpdateAcknowledge(ran *context.AmfRan, successfulOut
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RANConfigurationUpdateAcknowledge", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "RANConfigurationUpdateAcknowledge", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -9498,7 +9498,7 @@ func handlerRANConfigurationUpdateFailure(ran *context.AmfRan, unsuccessfulOutco
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RANConfigurationUpdateFailure", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "RANConfigurationUpdateFailure", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -9603,7 +9603,7 @@ func handlerRRCInactiveTransitionReport(ran *context.AmfRan, initiatingMessage *
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RRCInactiveTransitionReport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "RRCInactiveTransitionReport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -9780,7 +9780,7 @@ func handlerRerouteNASRequest(ran *context.AmfRan, initiatingMessage *ngapType.I
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "RerouteNASRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "RerouteNASRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -9968,7 +9968,7 @@ func handlerSecondaryRATDataUsageReport(ran *context.AmfRan, initiatingMessage *
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "SecondaryRATDataUsageReport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "SecondaryRATDataUsageReport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -10144,7 +10144,7 @@ func handlerTraceFailureIndication(ran *context.AmfRan, initiatingMessage *ngapT
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "TraceFailureIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "TraceFailureIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -10335,7 +10335,7 @@ func handlerTraceStart(ran *context.AmfRan, initiatingMessage *ngapType.Initiati
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "TraceStart", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "TraceStart", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -10509,7 +10509,7 @@ func handlerUEContextModificationFailure(ran *context.AmfRan, unsuccessfulOutcom
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextModificationFailure", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UEContextModificationFailure", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -10648,7 +10648,7 @@ func handlerUEContextModificationRequest(ran *context.AmfRan, initiatingMessage 
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextModificationRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UEContextModificationRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -10940,7 +10940,7 @@ func handlerUEContextModificationResponse(ran *context.AmfRan, successfulOutcome
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextModificationResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UEContextModificationResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -11076,7 +11076,7 @@ func handlerUEContextReleaseCommand(ran *context.AmfRan, initiatingMessage *ngap
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextReleaseCommand", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UEContextReleaseCommand", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -11213,7 +11213,7 @@ func handlerUEContextReleaseComplete(ran *context.AmfRan, successfulOutcome *nga
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextReleaseComplete", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UEContextReleaseComplete", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -11360,7 +11360,7 @@ func handlerUEContextReleaseRequest(ran *context.AmfRan, initiatingMessage *ngap
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UEContextReleaseRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UEContextReleaseRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -11533,7 +11533,7 @@ func handlerUERadioCapabilityCheckRequest(ran *context.AmfRan, initiatingMessage
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UERadioCapabilityCheckRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UERadioCapabilityCheckRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -11704,7 +11704,7 @@ func handlerUERadioCapabilityCheckResponse(ran *context.AmfRan, successfulOutcom
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UERadioCapabilityCheckResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UERadioCapabilityCheckResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -11839,7 +11839,7 @@ func handlerUERadioCapabilityInfoIndication(ran *context.AmfRan, initiatingMessa
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UERadioCapabilityInfoIndication", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UERadioCapabilityInfoIndication", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -12011,7 +12011,7 @@ func handlerUETNLABindingReleaseRequest(ran *context.AmfRan, initiatingMessage *
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UETNLABindingReleaseRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UETNLABindingReleaseRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -12167,7 +12167,7 @@ func handlerUplinkNASTransport(ran *context.AmfRan, initiatingMessage *ngapType.
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkNASTransport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UplinkNASTransport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -12349,7 +12349,7 @@ func handlerUplinkNonUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingM
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkNonUEAssociatedNRPPaTransport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UplinkNonUEAssociatedNRPPaTransport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -12474,7 +12474,7 @@ func handlerUplinkRANConfigurationTransfer(ran *context.AmfRan, initiatingMessag
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkRANConfigurationTransfer", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UplinkRANConfigurationTransfer", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -12581,7 +12581,7 @@ func handlerUplinkRANStatusTransfer(ran *context.AmfRan, initiatingMessage *ngap
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkRANStatusTransfer", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UplinkRANStatusTransfer", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -12749,7 +12749,7 @@ func handlerUplinkUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingMess
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "UplinkUEAssociatedNRPPaTransport", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "UplinkUEAssociatedNRPPaTransport", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -12949,7 +12949,7 @@ func handlerWriteReplaceWarningRequest(ran *context.AmfRan, initiatingMessage *n
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "WriteReplaceWarningRequest", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "WriteReplaceWarningRequest", "status": status}).Add(1)
 	}()
 
 	abort := false
@@ -13246,7 +13246,7 @@ func handlerWriteReplaceWarningResponse(ran *context.AmfRan, successfulOutcome *
 			status = "success"
 		}
 
-		metrics.NgapMsgCounter.With(prometheus.Labels{"name": "WriteReplaceWarningResponse", "status": status}).Add(1)
+		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": "WriteReplaceWarningResponse", "status": status}).Add(1)
 	}()
 
 	abort := false
