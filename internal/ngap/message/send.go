@@ -112,7 +112,7 @@ func SendNGSetupResponse(ran *context.AmfRan) {
 }
 
 func SendNGSetupFailure(ran *context.AmfRan, cause ngapType.Cause) {
-	ngapMsgType := "NGSetupResponse"
+	ngapMsgType := "NGSetupFailure"
 	metricsStatus := false
 	defer incrMetrics(ngapMsgType, &metricsStatus)
 
