@@ -266,6 +266,17 @@ func generateHandler() {
 			"metrics \"github.com/free5gc/amf/internal/metrics/ngap\"",
 		})
 
+	fmt.Fprintln(fOut, "func incrMetrics(msgType string, metricStatusSuccess *bool) {")
+	fmt.Fprintln(fOut, "if metricStatusSuccess != nil && *metricStatusSuccess {")
+	fmt.Fprintln(fOut, "metrics.NgapMsgRcvCounter.With(prometheus.Labels{\"name\": msgType, "+
+		"\"status\": metrics.SuccessMetric}).Add(1)")
+	fmt.Fprintln(fOut, "} else {")
+	fmt.Fprintln(fOut, "metrics.NgapMsgRcvCounter.With(prometheus.Labels{\"name\": msgType, "+
+		"\"status\": metrics.FailureMetric}).Add(1)")
+	fmt.Fprintln(fOut, "}")
+	fmt.Fprintln(fOut, "}")
+	fmt.Fprintln(fOut, "")
+
 	// generate handler functions
 	for _, msgName := range msgNames {
 		mInfo := MsgTable[msgName]
@@ -311,20 +322,11 @@ func generateHandler() {
 		fmt.Fprintln(fOut, "var syntaxCause *ngapType.Cause")
 		fmt.Fprintln(fOut, "var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList")
 
-		// Increase metric counter depending of the outcome of the handler generated function.
+		// Increase metric counter depending on the outcome of the handler generated function.
 		fmt.Fprintln(fOut, "")
 		fmt.Fprintln(fOut, "metricStatusOk := false")
 		fmt.Fprintln(fOut, "")
-		fmt.Fprintln(fOut, "defer func () {")
-		fmt.Fprintln(fOut, "status := \"error\"")
-		fmt.Fprintln(fOut, "")
-		fmt.Fprintln(fOut, "if metricStatusOk {")
-		fmt.Fprintln(fOut, "status = \"success\"")
-		fmt.Fprintln(fOut, "}")
-		fmt.Fprintln(fOut, "")
-		fmt.Fprintf(fOut, "metrics.NgapMsgRcvCounter.With(prometheus.Labels{\"name\" : \"%s\", \"status\" : status}).Add(1)", msgName)
-		fmt.Fprintln(fOut, "")
-		fmt.Fprintln(fOut, "}()")
+		fmt.Fprintf(fOut, "defer incrMetrics(\"%s\", &metricStatusOk)\n", msgName)
 		fmt.Fprintln(fOut, "")
 
 		fmt.Fprintln(fOut, "abort := false")
