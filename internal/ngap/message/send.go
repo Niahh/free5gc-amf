@@ -3,13 +3,16 @@ package message
 import (
 	"github.com/free5gc/amf/internal/context"
 	"github.com/free5gc/amf/internal/logger"
-	metrics "github.com/free5gc/amf/internal/metrics/ngap"
+	global_metrics "github.com/free5gc/amf/internal/metrics"
+	ngap_metrics "github.com/free5gc/amf/internal/metrics/ngap"
 	callback "github.com/free5gc/amf/internal/sbi/processor/notifier"
 	"github.com/free5gc/aper"
 	"github.com/free5gc/ngap/ngapType"
 	"github.com/free5gc/openapi/models"
 	"github.com/prometheus/client_golang/prometheus"
 )
+
+var emptyCause = ngapType.Cause{Present: 0}
 
 func SendToRan(ran *context.AmfRan, packet []byte) bool {
 	defer func() {
@@ -87,18 +90,24 @@ func NasSendToRan(ue *context.AmfUe, accessType models.AccessType, packet []byte
 	return SendToRanUe(ranUe, packet)
 }
 
-func incrMetrics(msgType string, metricStatusSuccess *bool) {
-	if metricStatusSuccess != nil && *metricStatusSuccess {
-		metrics.NgapMsgSentCounter.With(prometheus.Labels{"name": msgType, "status": metrics.SuccessMetric}).Add(1)
-	} else {
-		metrics.NgapMsgSentCounter.With(prometheus.Labels{"name": msgType, "status": metrics.FailureMetric}).Add(1)
+func incrMetrics(msgType string, metricStatusSuccess *bool, syntaxCause ngapType.Cause) {
+	cause := ""
+	if syntaxCause.Present != 0 {
+		cause = GetCauseErrorStr(&syntaxCause)
 	}
+
+	status := global_metrics.FailureMetric
+	if metricStatusSuccess != nil && *metricStatusSuccess {
+		status = global_metrics.SuccessMetric
+	}
+
+	ngap_metrics.NgapMsgSentCounter.With(prometheus.Labels{"name": msgType, "status": status, "cause": cause}).Add(1)
 }
 
 func SendNGSetupResponse(ran *context.AmfRan) {
 	ngapMsgType := "NGSetupResponse"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	ran.Log.Info("Send NG-Setup response")
 
@@ -114,7 +123,7 @@ func SendNGSetupResponse(ran *context.AmfRan) {
 func SendNGSetupFailure(ran *context.AmfRan, cause ngapType.Cause) {
 	ngapMsgType := "NGSetupFailure"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, cause)
 
 	ran.Log.Info("Send NG-Setup failure")
 
@@ -137,7 +146,7 @@ func SendNGReset(ran *context.AmfRan, cause ngapType.Cause,
 ) {
 	ngapMsgType := "NGReset"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, cause)
 
 	ran.Log.Info("Send NG Reset")
 
@@ -154,7 +163,7 @@ func SendNGResetAcknowledge(ran *context.AmfRan, partOfNGInterface *ngapType.UEA
 ) {
 	ngapMsgType := "NGResetAcknowledge"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	ran.Log.Info("Send NG Reset Acknowledge")
 
@@ -176,7 +185,7 @@ func SendDownlinkNasTransport(ue *context.RanUe, nasPdu []byte,
 ) {
 	ngapMsgType := "DownlinkNasTransport"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -202,7 +211,7 @@ func SendPDUSessionResourceReleaseCommand(ue *context.RanUe, nasPdu []byte,
 ) {
 	ngapMsgType := "PDUSessionResourceReleaseCommand"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -222,7 +231,7 @@ func SendPDUSessionResourceReleaseCommand(ue *context.RanUe, nasPdu []byte,
 func SendUEContextReleaseCommand(ue *context.RanUe, action context.RelAction, causePresent int, cause aper.Enumerated) {
 	ngapMsgType := "UEContextReleaseCommand"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -254,7 +263,7 @@ func SendErrorIndication(ran *context.AmfRan, amfUeNgapId *ngapType.AMFUENGAPID,
 ) {
 	ngapMsgType := "ErrorIndication"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, *cause)
 
 	if ran == nil {
 		logger.NgapLog.Error("Ran is nil")
@@ -283,7 +292,7 @@ func SendErrorIndication(ran *context.AmfRan, amfUeNgapId *ngapType.AMFUENGAPID,
 func SendUERadioCapabilityCheckRequest(ue *context.RanUe) {
 	ngapMsgType := "UERadioCapabilityCheckRequest"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -303,7 +312,7 @@ func SendUERadioCapabilityCheckRequest(ue *context.RanUe) {
 func SendHandoverCancelAcknowledge(ue *context.RanUe, criticalityDiagnostics *ngapType.CriticalityDiagnostics) {
 	ngapMsgType := "HandoverCancelAcknowledge"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -327,7 +336,7 @@ func SendPDUSessionResourceSetupRequest(ue *context.RanUe, nasPdu []byte,
 ) {
 	ngapMsgType := "PDUSessionResourceSetupRequest"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -359,7 +368,7 @@ func SendPDUSessionResourceModifyConfirm(
 ) {
 	ngapMsgType := "PDUSessionResourceModifyConfirm"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -393,7 +402,7 @@ func SendPDUSessionResourceModifyRequest(ue *context.RanUe,
 ) {
 	ngapMsgType := "PDUSessionResourceModifyRequest"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -426,7 +435,7 @@ func SendInitialContextSetupRequest(
 ) {
 	ngapMsgType := "InitialContextSetupRequest"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if amfUe == nil {
 		logger.NgapLog.Error("AmfUe is nil")
@@ -463,7 +472,7 @@ func SendUEContextModificationRequest(
 ) {
 	ngapMsgType := "UEContextModificationRequest"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if amfUe == nil {
 		logger.NgapLog.Error("AmfUe is nil")
@@ -494,7 +503,7 @@ func SendHandoverCommand(
 ) {
 	ngapMsgType := "HandoverCommand"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if sourceUe == nil {
 		logger.NgapLog.Error("SourceUe is nil")
@@ -530,7 +539,7 @@ func SendHandoverPreparationFailure(sourceUe *context.RanUe, cause ngapType.Caus
 ) {
 	ngapMsgType := "HandoverPreparationFailure"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, cause)
 
 	if sourceUe == nil {
 		logger.NgapLog.Error("SourceUe is nil")
@@ -568,7 +577,7 @@ func SendHandoverRequest(sourceUe *context.RanUe, targetRan *context.AmfRan, cau
 ) {
 	ngapMsgType := "HandoverRequest"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, cause)
 
 	if sourceUe == nil {
 		logger.NgapLog.Error("sourceUe is nil")
@@ -647,7 +656,7 @@ func SendPathSwitchRequestAcknowledge(
 ) {
 	ngapMsgType := "PathSwitchRequestAcknowledge"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -687,7 +696,7 @@ func SendPathSwitchRequestFailure(
 ) {
 	ngapMsgType := "PathSwitchRequestFailure"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	ran.Log.Info("Send Path Switch Request Failure")
 
@@ -709,7 +718,7 @@ func SendPathSwitchRequestFailure(
 func SendDownlinkRanStatusTransfer(ue *context.RanUe, container ngapType.RANStatusTransferTransparentContainer) {
 	ngapMsgType := "DownlinkRanStatusTransfer"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -745,7 +754,7 @@ func SendDownlinkRanStatusTransfer(ue *context.RanUe, container ngapType.RANStat
 func SendPaging(ue *context.AmfUe, ngapBuf []byte) {
 	ngapMsgType := "Paging"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	// var pagingPriority *ngapType.PagingPriority
 	if ue == nil {
@@ -810,7 +819,7 @@ func SendRerouteNasRequest(ue *context.AmfUe, anType models.AccessType, amfUeNga
 ) {
 	ngapMsgType := "RerouteNasRequest"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("AmfUe is nil")
@@ -838,7 +847,7 @@ func SendRanConfigurationUpdateAcknowledge(
 ) {
 	ngapMsgType := "RanConfigurationUpdateAcknowledge"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ran == nil {
 		logger.NgapLog.Error("Ran is nil")
@@ -863,7 +872,7 @@ func SendRanConfigurationUpdateFailure(ran *context.AmfRan, cause ngapType.Cause
 ) {
 	ngapMsgType := "RanConfigurationUpdateFailure"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, cause)
 
 	if ran == nil {
 		logger.NgapLog.Error("Ran is nil")
@@ -890,7 +899,7 @@ func SendRanConfigurationUpdateFailure(ran *context.AmfRan, cause ngapType.Cause
 func SendAMFStatusIndication(ran *context.AmfRan, unavailableGUAMIList ngapType.UnavailableGUAMIList) {
 	ngapMsgType := "AMFStatusIndication"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ran == nil {
 		logger.NgapLog.Error("Ran is nil")
@@ -926,7 +935,7 @@ func SendOverloadStart(
 ) {
 	ngapMsgType := "OverloadStart"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ran == nil {
 		logger.NgapLog.Error("Ran is nil")
@@ -958,7 +967,7 @@ func SendOverloadStart(
 func SendOverloadStop(ran *context.AmfRan) {
 	ngapMsgType := "OverloadStop"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ran == nil {
 		logger.NgapLog.Error("Ran is nil")
@@ -980,7 +989,7 @@ func SendOverloadStop(ran *context.AmfRan) {
 func SendDownlinkRanConfigurationTransfer(ran *context.AmfRan, transfer *ngapType.SONConfigurationTransfer) {
 	ngapMsgType := "DownlinkRanConfigurationTransfer"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ran == nil {
 		logger.NgapLog.Error("Ran is nil")
@@ -1003,7 +1012,7 @@ func SendDownlinkRanConfigurationTransfer(ran *context.AmfRan, transfer *ngapTyp
 func SendDownlinkNonUEAssociatedNRPPATransport(ue *context.RanUe, nRPPaPDU ngapType.NRPPaPDU) {
 	ngapMsgType := "DownlinkNonUEAssociatedNRPPATransport"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -1029,7 +1038,7 @@ func SendDownlinkNonUEAssociatedNRPPATransport(ue *context.RanUe, nRPPaPDU ngapT
 func SendDeactivateTrace(amfUe *context.AmfUe, anType models.AccessType) {
 	ngapMsgType := "DeactivateTrace"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if amfUe == nil {
 		logger.NgapLog.Error("AmfUe is nil")
@@ -1071,7 +1080,7 @@ func SendLocationReportingControl(
 ) {
 	ngapMsgType := "LocationReportingControl"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -1103,7 +1112,7 @@ func SendLocationReportingControl(
 func SendUETNLABindingReleaseRequest(ue *context.RanUe) {
 	ngapMsgType := "UETNLABindingReleaseRequest"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")
@@ -1127,7 +1136,7 @@ func SendAMFConfigurationUpdate(ran *context.AmfRan, usage ngapType.TNLAssociati
 ) {
 	ngapMsgType := "AMFConfigurationUpdate"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ran == nil {
 		logger.NgapLog.Error("Ran is nil")
@@ -1150,7 +1159,7 @@ func SendAMFConfigurationUpdate(ran *context.AmfRan, usage ngapType.TNLAssociati
 func SendDownlinkUEAssociatedNRPPaTransport(ue *context.RanUe, nRPPaPDU ngapType.NRPPaPDU) {
 	ngapMsgType := "DownlinkUEAssociatedNRPPaTransport"
 	metricsStatus := false
-	defer incrMetrics(ngapMsgType, &metricsStatus)
+	defer incrMetrics(ngapMsgType, &metricsStatus, emptyCause)
 
 	if ue == nil {
 		logger.NgapLog.Error("RanUe is nil")

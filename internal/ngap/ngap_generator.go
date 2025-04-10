@@ -252,6 +252,19 @@ func fixIEs() {
 	MsgTable["UplinkUEAssociatedNRPPaTransport"].IEs["id-NRPPa-PDU"].Unimplemented = true
 }
 
+func generateMetricFunction(fOut *outputFile) {
+	fmt.Fprintln(fOut, "func incrMetrics(msgType string, metricStatusSuccess *bool, syntaxCause *ngapType.Cause) {")
+	fmt.Fprintln(fOut, "if metricStatusSuccess != nil && *metricStatusSuccess {")
+	fmt.Fprintln(fOut, "ngap_metrics.NgapMsgRcvCounter.With(prometheus.Labels{\"name\": msgType, "+
+		"\"status\": global_metrics.SuccessMetric, \"cause\": \"\" }).Add(1)")
+	fmt.Fprintln(fOut, "} else {")
+	fmt.Fprintln(fOut, "ngap_metrics.NgapMsgRcvCounter.With(prometheus.Labels{\"name\": msgType, "+
+		"\"status\": global_metrics.FailureMetric, \"cause\": ngap_message.GetCauseErrorStr(syntaxCause)}).Add(1)")
+	fmt.Fprintln(fOut, "}")
+	fmt.Fprintln(fOut, "}")
+	fmt.Fprintln(fOut, "")
+}
+
 // generate NGAP handler file
 func generateHandler() {
 	fOut := newOutputFile("handler_generated.go",
@@ -263,19 +276,11 @@ func generateHandler() {
 			"\"github.com/prometheus/client_golang/prometheus\"",
 			"\"github.com/free5gc/ngap\"",
 			"\"github.com/free5gc/ngap/ngapType\"",
-			"metrics \"github.com/free5gc/amf/internal/metrics/ngap\"",
+			"ngap_metrics \"github.com/free5gc/amf/internal/metrics/ngap\"",
+			"global_metrics \"github.com/free5gc/amf/internal/metrics\"",
 		})
 
-	fmt.Fprintln(fOut, "func incrMetrics(msgType string, metricStatusSuccess *bool) {")
-	fmt.Fprintln(fOut, "if metricStatusSuccess != nil && *metricStatusSuccess {")
-	fmt.Fprintln(fOut, "metrics.NgapMsgRcvCounter.With(prometheus.Labels{\"name\": msgType, "+
-		"\"status\": metrics.SuccessMetric}).Add(1)")
-	fmt.Fprintln(fOut, "} else {")
-	fmt.Fprintln(fOut, "metrics.NgapMsgRcvCounter.With(prometheus.Labels{\"name\": msgType, "+
-		"\"status\": metrics.FailureMetric}).Add(1)")
-	fmt.Fprintln(fOut, "}")
-	fmt.Fprintln(fOut, "}")
-	fmt.Fprintln(fOut, "")
+	generateMetricFunction(fOut)
 
 	// generate handler functions
 	for _, msgName := range msgNames {
@@ -326,7 +331,7 @@ func generateHandler() {
 		fmt.Fprintln(fOut, "")
 		fmt.Fprintln(fOut, "metricStatusOk := false")
 		fmt.Fprintln(fOut, "")
-		fmt.Fprintf(fOut, "defer incrMetrics(\"%s\", &metricStatusOk)\n", msgName)
+		fmt.Fprintf(fOut, "defer incrMetrics(\"%s\", &metricStatusOk, syntaxCause)\n", msgName)
 		fmt.Fprintln(fOut, "")
 
 		fmt.Fprintln(fOut, "abort := false")

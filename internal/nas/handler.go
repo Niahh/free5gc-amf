@@ -2,13 +2,85 @@ package nas
 
 import (
 	"fmt"
+	"github.com/free5gc/amf/internal/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 
 	amf_context "github.com/free5gc/amf/internal/context"
 	gmm_common "github.com/free5gc/amf/internal/gmm/common"
 	"github.com/free5gc/amf/internal/logger"
+	nas_metrics "github.com/free5gc/amf/internal/metrics/nas"
 	"github.com/free5gc/amf/internal/nas/nas_security"
 	"github.com/free5gc/nas"
 )
+
+func incrMetrics(msg *nas.Message, metricStatusSuccess *bool) {
+	nasMessageType := ""
+	if msg.GmmMessage.AuthenticationRequest != nil {
+		nasMessageType = "AuthenticationRequest"
+	} else if msg.GmmMessage.AuthenticationResponse != nil {
+		nasMessageType = "AuthenticationResponse"
+	} else if msg.GmmMessage.AuthenticationResult != nil {
+		nasMessageType = "AuthenticationResult"
+	} else if msg.GmmMessage.AuthenticationFailure != nil {
+		nasMessageType = "AuthenticationFailure"
+	} else if msg.GmmMessage.AuthenticationReject != nil {
+		nasMessageType = "AuthenticationReject"
+	} else if msg.GmmMessage.RegistrationRequest != nil {
+		nasMessageType = "RegistrationRequest"
+	} else if msg.GmmMessage.RegistrationAccept != nil {
+		nasMessageType = "RegistrationAccept"
+	} else if msg.GmmMessage.RegistrationComplete != nil {
+		nasMessageType = "RegistrationComplete"
+	} else if msg.GmmMessage.RegistrationReject != nil {
+		nasMessageType = "RegistrationReject"
+	} else if msg.GmmMessage.ULNASTransport != nil {
+		nasMessageType = "ULNASTransport"
+	} else if msg.GmmMessage.DLNASTransport != nil {
+		nasMessageType = "DLNASTransport"
+	} else if msg.GmmMessage.DeregistrationRequestUEOriginatingDeregistration != nil {
+		nasMessageType = "DeregistrationRequestUEOriginatingDeregistration"
+	} else if msg.GmmMessage.DeregistrationAcceptUEOriginatingDeregistration != nil {
+		nasMessageType = "DeregistrationAcceptUEOriginatingDeregistration"
+	} else if msg.GmmMessage.DeregistrationRequestUETerminatedDeregistration != nil {
+		nasMessageType = "DeregistrationRequestUETerminatedDeregistration"
+	} else if msg.GmmMessage.DeregistrationAcceptUETerminatedDeregistration != nil {
+		nasMessageType = "DeregistrationAcceptUETerminatedDeregistration"
+	} else if msg.GmmMessage.ServiceRequest != nil {
+		nasMessageType = "ServiceRequest"
+	} else if msg.GmmMessage.ServiceAccept != nil {
+		nasMessageType = "ServiceAccept"
+	} else if msg.GmmMessage.ServiceReject != nil {
+		nasMessageType = "ServiceReject"
+	} else if msg.GmmMessage.ConfigurationUpdateCommand != nil {
+		nasMessageType = "ConfigurationUpdateCommand"
+	} else if msg.GmmMessage.ConfigurationUpdateComplete != nil {
+		nasMessageType = "ConfigurationUpdateComplete"
+	} else if msg.GmmMessage.IdentityRequest != nil {
+		nasMessageType = "IdentityRequest"
+	} else if msg.GmmMessage.IdentityResponse != nil {
+		nasMessageType = "IdentityResponse"
+	} else if msg.GmmMessage.Notification != nil {
+		nasMessageType = "Notification"
+	} else if msg.GmmMessage.NotificationResponse != nil {
+		nasMessageType = "NotificationResponse"
+	} else if msg.GmmMessage.SecurityModeCommand != nil {
+		nasMessageType = "SecurityModeCommand"
+	} else if msg.GmmMessage.SecurityModeComplete != nil {
+		nasMessageType = "SecurityModeComplete"
+	} else if msg.GmmMessage.SecurityModeReject != nil {
+		nasMessageType = "SecurityModeReject"
+	} else if msg.GmmMessage.SecurityProtected5GSNASMessage != nil {
+		nasMessageType = "SecurityProtected5GSNASMessage"
+	} else if msg.GmmMessage.Status5GMM != nil {
+		nasMessageType = "Status5GMM"
+	}
+
+	metricStatus := metrics.FailureMetric
+	if metricStatusSuccess != nil && *metricStatusSuccess {
+		metricStatus = metrics.SuccessMetric
+	}
+	nas_metrics.NasMsgRcvCounter.With(prometheus.Labels{"name": nasMessageType, "status": metricStatus}).Inc()
+}
 
 func HandleNAS(ranUe *amf_context.RanUe, procedureCode int64, nasPdu []byte, initialMessage bool) {
 	amfSelf := amf_context.GetSelf()
@@ -43,6 +115,13 @@ func HandleNAS(ranUe *amf_context.RanUe, procedureCode int64, nasPdu []byte, ini
 		ranUe.AmfUe.NASLog.Errorln(err)
 		return
 	}
+
+	// [todo] Here I can retrieve the msg object, that contains the list of possible nas type message as pointers
+	// I could make a function to retrieve the nas message type from it.
+
+	metricStatusOk := true
+	defer incrMetrics(msg, &metricStatusOk)
+
 	ranUe.AmfUe.NasPduValue = nasPdu
 	ranUe.AmfUe.MacFailed = !integrityProtected
 
@@ -53,6 +132,7 @@ func HandleNAS(ranUe *amf_context.RanUe, procedureCode int64, nasPdu []byte, ini
 
 	if errDispatch := Dispatch(ranUe.AmfUe, ranUe.Ran.AnType, procedureCode, msg); errDispatch != nil {
 		ranUe.AmfUe.NASLog.Errorf("Handle NAS Error: %v", errDispatch)
+		metricStatusOk = false
 	}
 }
 

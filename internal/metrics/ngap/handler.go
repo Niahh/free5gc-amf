@@ -8,9 +8,6 @@ const (
 
 	ngapMsgSentCounterName = "ngap_msg_sent_total"
 	ngapMsgSentCounterDesc = "Total number of NGAP message sent by the AMF "
-
-	SuccessMetric = "successful"
-	FailureMetric = "failure"
 )
 
 var (
@@ -27,7 +24,7 @@ func GetNgapHandlerMetrics(namespace string) []prometheus.Collector {
 			Name:      ngapMsgRcvCounterName,
 			Help:      ngapMsgRcvCounterDesc,
 		},
-		[]string{"name", "status"},
+		[]string{"name", "status", "cause"},
 	)
 
 	metrics = append(metrics, NgapMsgRcvCounter)
@@ -38,7 +35,7 @@ func GetNgapHandlerMetrics(namespace string) []prometheus.Collector {
 			Name:      ngapMsgSentCounterName,
 			Help:      ngapMsgSentCounterDesc,
 		},
-		[]string{"name", "status"},
+		[]string{"name", "status", "cause"},
 	)
 
 	metrics = append(metrics, NgapMsgSentCounter)

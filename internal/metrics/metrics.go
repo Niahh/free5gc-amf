@@ -2,6 +2,7 @@
 package metrics
 
 import (
+	"github.com/free5gc/amf/internal/metrics/nas"
 	"github.com/free5gc/amf/internal/metrics/ngap"
 	"github.com/free5gc/amf/internal/metrics/sbi"
 	"github.com/free5gc/amf/pkg/factory"
@@ -9,8 +10,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/collectors"
 )
 
+const (
+	SuccessMetric = "successful"
+	FailureMetric = "failure"
+)
+
 // Init initializes all Prometheus metrics
-func Init(cfg *factory.Config) *prometheus.Registry{
+func Init(cfg *factory.Config) *prometheus.Registry {
 	reg := prometheus.NewRegistry()
 
 	namespace := cfg.GetMetricsNamespace()
@@ -21,6 +27,7 @@ func Init(cfg *factory.Config) *prometheus.Registry{
 	amfMetrics = append(amfMetrics, sbi.GetCommunicationServiceMetrics(namespace)...)
 	amfMetrics = append(amfMetrics, ngap.GetHandoverRequestCounter(namespace)...)
 	amfMetrics = append(amfMetrics, ngap.GetNgapHandlerMetrics(namespace)...)
+	amfMetrics = append(amfMetrics, nas.GetNasHandlerMetrics(namespace)...)
 
 	initMetric(amfMetrics, reg)
 

@@ -4,18 +4,19 @@ package ngap
 import (
 	"github.com/free5gc/amf/internal/context"
 	"github.com/free5gc/amf/internal/logger"
-	metrics "github.com/free5gc/amf/internal/metrics/ngap"
+	global_metrics "github.com/free5gc/amf/internal/metrics"
+	ngap_metrics "github.com/free5gc/amf/internal/metrics/ngap"
 	ngap_message "github.com/free5gc/amf/internal/ngap/message"
 	"github.com/free5gc/ngap"
 	"github.com/free5gc/ngap/ngapType"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func incrMetrics(msgType string, metricStatusSuccess *bool) {
+func incrMetrics(msgType string, metricStatusSuccess *bool, syntaxCause *ngapType.Cause) {
 	if metricStatusSuccess != nil && *metricStatusSuccess {
-		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": msgType, "status": metrics.SuccessMetric}).Add(1)
+		ngap_metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": msgType, "status": global_metrics.SuccessMetric, "cause": ""}).Add(1)
 	} else {
-		metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": msgType, "status": metrics.FailureMetric}).Add(1)
+		ngap_metrics.NgapMsgRcvCounter.With(prometheus.Labels{"name": msgType, "status": global_metrics.FailureMetric, "cause": ngap_message.GetCauseErrorStr(syntaxCause)}).Add(1)
 	}
 }
 
@@ -33,7 +34,7 @@ func handlerAMFConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapT
 
 	metricStatusOk := false
 
-	defer incrMetrics("AMFConfigurationUpdate", &metricStatusOk)
+	defer incrMetrics("AMFConfigurationUpdate", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -219,7 +220,7 @@ func handlerAMFConfigurationUpdateAcknowledge(ran *context.AmfRan, successfulOut
 
 	metricStatusOk := false
 
-	defer incrMetrics("AMFConfigurationUpdateAcknowledge", &metricStatusOk)
+	defer incrMetrics("AMFConfigurationUpdateAcknowledge", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -312,7 +313,7 @@ func handlerAMFConfigurationUpdateFailure(ran *context.AmfRan, unsuccessfulOutco
 
 	metricStatusOk := false
 
-	defer incrMetrics("AMFConfigurationUpdateFailure", &metricStatusOk)
+	defer incrMetrics("AMFConfigurationUpdateFailure", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -404,7 +405,7 @@ func handlerAMFStatusIndication(ran *context.AmfRan, initiatingMessage *ngapType
 
 	metricStatusOk := false
 
-	defer incrMetrics("AMFStatusIndication", &metricStatusOk)
+	defer incrMetrics("AMFStatusIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -514,7 +515,7 @@ func handlerCellTrafficTrace(ran *context.AmfRan, initiatingMessage *ngapType.In
 
 	metricStatusOk := false
 
-	defer incrMetrics("CellTrafficTrace", &metricStatusOk)
+	defer incrMetrics("CellTrafficTrace", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -700,7 +701,7 @@ func handlerDeactivateTrace(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 
 	metricStatusOk := false
 
-	defer incrMetrics("DeactivateTrace", &metricStatusOk)
+	defer incrMetrics("DeactivateTrace", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -871,7 +872,7 @@ func handlerDownlinkNASTransport(ran *context.AmfRan, initiatingMessage *ngapTyp
 
 	metricStatusOk := false
 
-	defer incrMetrics("DownlinkNASTransport", &metricStatusOk)
+	defer incrMetrics("DownlinkNASTransport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -1132,7 +1133,7 @@ func handlerDownlinkNonUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatin
 
 	metricStatusOk := false
 
-	defer incrMetrics("DownlinkNonUEAssociatedNRPPaTransport", &metricStatusOk)
+	defer incrMetrics("DownlinkNonUEAssociatedNRPPaTransport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -1264,7 +1265,7 @@ func handlerDownlinkRANConfigurationTransfer(ran *context.AmfRan, initiatingMess
 
 	metricStatusOk := false
 
-	defer incrMetrics("DownlinkRANConfigurationTransfer", &metricStatusOk)
+	defer incrMetrics("DownlinkRANConfigurationTransfer", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -1375,7 +1376,7 @@ func handlerDownlinkRANStatusTransfer(ran *context.AmfRan, initiatingMessage *ng
 
 	metricStatusOk := false
 
-	defer incrMetrics("DownlinkRANStatusTransfer", &metricStatusOk)
+	defer incrMetrics("DownlinkRANStatusTransfer", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -1548,7 +1549,7 @@ func handlerDownlinkUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingMe
 
 	metricStatusOk := false
 
-	defer incrMetrics("DownlinkUEAssociatedNRPPaTransport", &metricStatusOk)
+	defer incrMetrics("DownlinkUEAssociatedNRPPaTransport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -1746,7 +1747,7 @@ func handlerErrorIndication(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 
 	metricStatusOk := false
 
-	defer incrMetrics("ErrorIndication", &metricStatusOk)
+	defer incrMetrics("ErrorIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -1843,7 +1844,7 @@ func handlerHandoverCancel(ran *context.AmfRan, initiatingMessage *ngapType.Init
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverCancel", &metricStatusOk)
+	defer incrMetrics("HandoverCancel", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -1993,7 +1994,7 @@ func handlerHandoverCancelAcknowledge(ran *context.AmfRan, successfulOutcome *ng
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverCancelAcknowledge", &metricStatusOk)
+	defer incrMetrics("HandoverCancelAcknowledge", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -2113,7 +2114,7 @@ func handlerHandoverCommand(ran *context.AmfRan, successfulOutcome *ngapType.Suc
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverCommand", &metricStatusOk)
+	defer incrMetrics("HandoverCommand", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -2281,7 +2282,7 @@ func handlerHandoverFailure(ran *context.AmfRan, unsuccessfulOutcome *ngapType.U
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverFailure", &metricStatusOk)
+	defer incrMetrics("HandoverFailure", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -2392,7 +2393,7 @@ func handlerHandoverNotify(ran *context.AmfRan, initiatingMessage *ngapType.Init
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverNotify", &metricStatusOk)
+	defer incrMetrics("HandoverNotify", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -2543,7 +2544,7 @@ func handlerHandoverPreparationFailure(ran *context.AmfRan, unsuccessfulOutcome 
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverPreparationFailure", &metricStatusOk)
+	defer incrMetrics("HandoverPreparationFailure", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -2686,7 +2687,7 @@ func handlerHandoverRequest(ran *context.AmfRan, initiatingMessage *ngapType.Ini
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverRequest", &metricStatusOk)
+	defer incrMetrics("HandoverRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -3164,7 +3165,7 @@ func handlerHandoverRequestAcknowledge(ran *context.AmfRan, successfulOutcome *n
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverRequestAcknowledge", &metricStatusOk)
+	defer incrMetrics("HandoverRequestAcknowledge", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -3315,7 +3316,7 @@ func handlerHandoverRequired(ran *context.AmfRan, initiatingMessage *ngapType.In
 
 	metricStatusOk := false
 
-	defer incrMetrics("HandoverRequired", &metricStatusOk)
+	defer incrMetrics("HandoverRequired", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -3596,7 +3597,7 @@ func handlerInitialContextSetupFailure(ran *context.AmfRan, unsuccessfulOutcome 
 
 	metricStatusOk := false
 
-	defer incrMetrics("InitialContextSetupFailure", &metricStatusOk)
+	defer incrMetrics("InitialContextSetupFailure", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -3745,7 +3746,7 @@ func handlerInitialContextSetupRequest(ran *context.AmfRan, initiatingMessage *n
 
 	metricStatusOk := false
 
-	defer incrMetrics("InitialContextSetupRequest", &metricStatusOk)
+	defer incrMetrics("InitialContextSetupRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -4204,7 +4205,7 @@ func handlerInitialContextSetupResponse(ran *context.AmfRan, successfulOutcome *
 
 	metricStatusOk := false
 
-	defer incrMetrics("InitialContextSetupResponse", &metricStatusOk)
+	defer incrMetrics("InitialContextSetupResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -4338,7 +4339,7 @@ func handlerInitialUEMessage(ran *context.AmfRan, message *ngapType.NGAPPDU, ini
 
 	metricStatusOk := false
 
-	defer incrMetrics("InitialUEMessage", &metricStatusOk)
+	defer incrMetrics("InitialUEMessage", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -4566,7 +4567,7 @@ func handlerLocationReport(ran *context.AmfRan, initiatingMessage *ngapType.Init
 
 	metricStatusOk := false
 
-	defer incrMetrics("LocationReport", &metricStatusOk)
+	defer incrMetrics("LocationReport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -4749,7 +4750,7 @@ func handlerLocationReportingControl(ran *context.AmfRan, initiatingMessage *nga
 
 	metricStatusOk := false
 
-	defer incrMetrics("LocationReportingControl", &metricStatusOk)
+	defer incrMetrics("LocationReportingControl", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -4914,7 +4915,7 @@ func handlerLocationReportingFailureIndication(ran *context.AmfRan, initiatingMe
 
 	metricStatusOk := false
 
-	defer incrMetrics("LocationReportingFailureIndication", &metricStatusOk)
+	defer incrMetrics("LocationReportingFailureIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -5065,7 +5066,7 @@ func handlerNASNonDeliveryIndication(ran *context.AmfRan, initiatingMessage *nga
 
 	metricStatusOk := false
 
-	defer incrMetrics("NASNonDeliveryIndication", &metricStatusOk)
+	defer incrMetrics("NASNonDeliveryIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -5232,7 +5233,7 @@ func handlerNGReset(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingM
 
 	metricStatusOk := false
 
-	defer incrMetrics("NGReset", &metricStatusOk)
+	defer incrMetrics("NGReset", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -5342,7 +5343,7 @@ func handlerNGResetAcknowledge(ran *context.AmfRan, successfulOutcome *ngapType.
 
 	metricStatusOk := false
 
-	defer incrMetrics("NGResetAcknowledge", &metricStatusOk)
+	defer incrMetrics("NGResetAcknowledge", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -5421,7 +5422,7 @@ func handlerNGSetupFailure(ran *context.AmfRan, unsuccessfulOutcome *ngapType.Un
 
 	metricStatusOk := false
 
-	defer incrMetrics("NGSetupFailure", &metricStatusOk)
+	defer incrMetrics("NGSetupFailure", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -5519,7 +5520,7 @@ func handlerNGSetupRequest(ran *context.AmfRan, initiatingMessage *ngapType.Init
 
 	metricStatusOk := false
 
-	defer incrMetrics("NGSetupRequest", &metricStatusOk)
+	defer incrMetrics("NGSetupRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -5698,7 +5699,7 @@ func handlerNGSetupResponse(ran *context.AmfRan, successfulOutcome *ngapType.Suc
 
 	metricStatusOk := false
 
-	defer incrMetrics("NGSetupResponse", &metricStatusOk)
+	defer incrMetrics("NGSetupResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -5833,7 +5834,7 @@ func handlerOverloadStart(ran *context.AmfRan, initiatingMessage *ngapType.Initi
 
 	metricStatusOk := false
 
-	defer incrMetrics("OverloadStart", &metricStatusOk)
+	defer incrMetrics("OverloadStart", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -5956,7 +5957,7 @@ func handlerOverloadStop(ran *context.AmfRan, initiatingMessage *ngapType.Initia
 
 	metricStatusOk := false
 
-	defer incrMetrics("OverloadStop", &metricStatusOk)
+	defer incrMetrics("OverloadStop", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -6039,7 +6040,7 @@ func handlerPDUSessionResourceModifyConfirm(ran *context.AmfRan, successfulOutco
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceModifyConfirm", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceModifyConfirm", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -6172,7 +6173,7 @@ func handlerPDUSessionResourceModifyIndication(ran *context.AmfRan, initiatingMe
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceModifyIndication", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceModifyIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -6330,7 +6331,7 @@ func handlerPDUSessionResourceModifyRequest(ran *context.AmfRan, initiatingMessa
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceModifyRequest", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceModifyRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -6520,7 +6521,7 @@ func handlerPDUSessionResourceModifyResponse(ran *context.AmfRan, successfulOutc
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceModifyResponse", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceModifyResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -6660,7 +6661,7 @@ func handlerPDUSessionResourceNotify(ran *context.AmfRan, initiatingMessage *nga
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceNotify", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceNotify", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -6839,7 +6840,7 @@ func handlerPDUSessionResourceReleaseCommand(ran *context.AmfRan, initiatingMess
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceReleaseCommand", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceReleaseCommand", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -7043,7 +7044,7 @@ func handlerPDUSessionResourceReleaseResponse(ran *context.AmfRan, successfulOut
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceReleaseResponse", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceReleaseResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -7178,7 +7179,7 @@ func handlerPDUSessionResourceSetupRequest(ran *context.AmfRan, initiatingMessag
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceSetupRequest", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceSetupRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -7397,7 +7398,7 @@ func handlerPDUSessionResourceSetupResponse(ran *context.AmfRan, successfulOutco
 
 	metricStatusOk := false
 
-	defer incrMetrics("PDUSessionResourceSetupResponse", &metricStatusOk)
+	defer incrMetrics("PDUSessionResourceSetupResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -7527,7 +7528,7 @@ func handlerPWSCancelRequest(ran *context.AmfRan, initiatingMessage *ngapType.In
 
 	metricStatusOk := false
 
-	defer incrMetrics("PWSCancelRequest", &metricStatusOk)
+	defer incrMetrics("PWSCancelRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -7691,7 +7692,7 @@ func handlerPWSCancelResponse(ran *context.AmfRan, successfulOutcome *ngapType.S
 
 	metricStatusOk := false
 
-	defer incrMetrics("PWSCancelResponse", &metricStatusOk)
+	defer incrMetrics("PWSCancelResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -7800,7 +7801,7 @@ func handlerPWSFailureIndication(ran *context.AmfRan, initiatingMessage *ngapTyp
 
 	metricStatusOk := false
 
-	defer incrMetrics("PWSFailureIndication", &metricStatusOk)
+	defer incrMetrics("PWSFailureIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -7934,7 +7935,7 @@ func handlerPWSRestartIndication(ran *context.AmfRan, initiatingMessage *ngapTyp
 
 	metricStatusOk := false
 
-	defer incrMetrics("PWSRestartIndication", &metricStatusOk)
+	defer incrMetrics("PWSRestartIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -8111,7 +8112,7 @@ func handlerPaging(ran *context.AmfRan, initiatingMessage *ngapType.InitiatingMe
 
 	metricStatusOk := false
 
-	defer incrMetrics("Paging", &metricStatusOk)
+	defer incrMetrics("Paging", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -8307,7 +8308,7 @@ func handlerPathSwitchRequest(ran *context.AmfRan, initiatingMessage *ngapType.I
 
 	metricStatusOk := false
 
-	defer incrMetrics("PathSwitchRequest", &metricStatusOk)
+	defer incrMetrics("PathSwitchRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -8510,7 +8511,7 @@ func handlerPathSwitchRequestAcknowledge(ran *context.AmfRan, successfulOutcome 
 
 	metricStatusOk := false
 
-	defer incrMetrics("PathSwitchRequestAcknowledge", &metricStatusOk)
+	defer incrMetrics("PathSwitchRequestAcknowledge", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -8718,7 +8719,7 @@ func handlerPathSwitchRequestFailure(ran *context.AmfRan, unsuccessfulOutcome *n
 
 	metricStatusOk := false
 
-	defer incrMetrics("PathSwitchRequestFailure", &metricStatusOk)
+	defer incrMetrics("PathSwitchRequestFailure", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -8846,7 +8847,7 @@ func handlerRANConfigurationUpdate(ran *context.AmfRan, initiatingMessage *ngapT
 
 	metricStatusOk := false
 
-	defer incrMetrics("RANConfigurationUpdate", &metricStatusOk)
+	defer incrMetrics("RANConfigurationUpdate", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -8985,7 +8986,7 @@ func handlerRANConfigurationUpdateAcknowledge(ran *context.AmfRan, successfulOut
 
 	metricStatusOk := false
 
-	defer incrMetrics("RANConfigurationUpdateAcknowledge", &metricStatusOk)
+	defer incrMetrics("RANConfigurationUpdateAcknowledge", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -9059,7 +9060,7 @@ func handlerRANConfigurationUpdateFailure(ran *context.AmfRan, unsuccessfulOutco
 
 	metricStatusOk := false
 
-	defer incrMetrics("RANConfigurationUpdateFailure", &metricStatusOk)
+	defer incrMetrics("RANConfigurationUpdateFailure", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -9156,7 +9157,7 @@ func handlerRRCInactiveTransitionReport(ran *context.AmfRan, initiatingMessage *
 
 	metricStatusOk := false
 
-	defer incrMetrics("RRCInactiveTransitionReport", &metricStatusOk)
+	defer incrMetrics("RRCInactiveTransitionReport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -9325,7 +9326,7 @@ func handlerRerouteNASRequest(ran *context.AmfRan, initiatingMessage *ngapType.I
 
 	metricStatusOk := false
 
-	defer incrMetrics("RerouteNASRequest", &metricStatusOk)
+	defer incrMetrics("RerouteNASRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -9505,7 +9506,7 @@ func handlerSecondaryRATDataUsageReport(ran *context.AmfRan, initiatingMessage *
 
 	metricStatusOk := false
 
-	defer incrMetrics("SecondaryRATDataUsageReport", &metricStatusOk)
+	defer incrMetrics("SecondaryRATDataUsageReport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -9673,7 +9674,7 @@ func handlerTraceFailureIndication(ran *context.AmfRan, initiatingMessage *ngapT
 
 	metricStatusOk := false
 
-	defer incrMetrics("TraceFailureIndication", &metricStatusOk)
+	defer incrMetrics("TraceFailureIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -9856,7 +9857,7 @@ func handlerTraceStart(ran *context.AmfRan, initiatingMessage *ngapType.Initiati
 
 	metricStatusOk := false
 
-	defer incrMetrics("TraceStart", &metricStatusOk)
+	defer incrMetrics("TraceStart", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -10022,7 +10023,7 @@ func handlerUEContextModificationFailure(ran *context.AmfRan, unsuccessfulOutcom
 
 	metricStatusOk := false
 
-	defer incrMetrics("UEContextModificationFailure", &metricStatusOk)
+	defer incrMetrics("UEContextModificationFailure", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -10153,7 +10154,7 @@ func handlerUEContextModificationRequest(ran *context.AmfRan, initiatingMessage 
 
 	metricStatusOk := false
 
-	defer incrMetrics("UEContextModificationRequest", &metricStatusOk)
+	defer incrMetrics("UEContextModificationRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -10437,7 +10438,7 @@ func handlerUEContextModificationResponse(ran *context.AmfRan, successfulOutcome
 
 	metricStatusOk := false
 
-	defer incrMetrics("UEContextModificationResponse", &metricStatusOk)
+	defer incrMetrics("UEContextModificationResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -10565,7 +10566,7 @@ func handlerUEContextReleaseCommand(ran *context.AmfRan, initiatingMessage *ngap
 
 	metricStatusOk := false
 
-	defer incrMetrics("UEContextReleaseCommand", &metricStatusOk)
+	defer incrMetrics("UEContextReleaseCommand", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -10694,7 +10695,7 @@ func handlerUEContextReleaseComplete(ran *context.AmfRan, successfulOutcome *nga
 
 	metricStatusOk := false
 
-	defer incrMetrics("UEContextReleaseComplete", &metricStatusOk)
+	defer incrMetrics("UEContextReleaseComplete", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -10833,7 +10834,7 @@ func handlerUEContextReleaseRequest(ran *context.AmfRan, initiatingMessage *ngap
 
 	metricStatusOk := false
 
-	defer incrMetrics("UEContextReleaseRequest", &metricStatusOk)
+	defer incrMetrics("UEContextReleaseRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -10998,7 +10999,7 @@ func handlerUERadioCapabilityCheckRequest(ran *context.AmfRan, initiatingMessage
 
 	metricStatusOk := false
 
-	defer incrMetrics("UERadioCapabilityCheckRequest", &metricStatusOk)
+	defer incrMetrics("UERadioCapabilityCheckRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -11161,7 +11162,7 @@ func handlerUERadioCapabilityCheckResponse(ran *context.AmfRan, successfulOutcom
 
 	metricStatusOk := false
 
-	defer incrMetrics("UERadioCapabilityCheckResponse", &metricStatusOk)
+	defer incrMetrics("UERadioCapabilityCheckResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -11288,7 +11289,7 @@ func handlerUERadioCapabilityInfoIndication(ran *context.AmfRan, initiatingMessa
 
 	metricStatusOk := false
 
-	defer incrMetrics("UERadioCapabilityInfoIndication", &metricStatusOk)
+	defer incrMetrics("UERadioCapabilityInfoIndication", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -11452,7 +11453,7 @@ func handlerUETNLABindingReleaseRequest(ran *context.AmfRan, initiatingMessage *
 
 	metricStatusOk := false
 
-	defer incrMetrics("UETNLABindingReleaseRequest", &metricStatusOk)
+	defer incrMetrics("UETNLABindingReleaseRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -11600,7 +11601,7 @@ func handlerUplinkNASTransport(ran *context.AmfRan, initiatingMessage *ngapType.
 
 	metricStatusOk := false
 
-	defer incrMetrics("UplinkNASTransport", &metricStatusOk)
+	defer incrMetrics("UplinkNASTransport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -11774,7 +11775,7 @@ func handlerUplinkNonUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingM
 
 	metricStatusOk := false
 
-	defer incrMetrics("UplinkNonUEAssociatedNRPPaTransport", &metricStatusOk)
+	defer incrMetrics("UplinkNonUEAssociatedNRPPaTransport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -11891,7 +11892,7 @@ func handlerUplinkRANConfigurationTransfer(ran *context.AmfRan, initiatingMessag
 
 	metricStatusOk := false
 
-	defer incrMetrics("UplinkRANConfigurationTransfer", &metricStatusOk)
+	defer incrMetrics("UplinkRANConfigurationTransfer", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -11990,7 +11991,7 @@ func handlerUplinkRANStatusTransfer(ran *context.AmfRan, initiatingMessage *ngap
 
 	metricStatusOk := false
 
-	defer incrMetrics("UplinkRANStatusTransfer", &metricStatusOk)
+	defer incrMetrics("UplinkRANStatusTransfer", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -12150,7 +12151,7 @@ func handlerUplinkUEAssociatedNRPPaTransport(ran *context.AmfRan, initiatingMess
 
 	metricStatusOk := false
 
-	defer incrMetrics("UplinkUEAssociatedNRPPaTransport", &metricStatusOk)
+	defer incrMetrics("UplinkUEAssociatedNRPPaTransport", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -12342,7 +12343,7 @@ func handlerWriteReplaceWarningRequest(ran *context.AmfRan, initiatingMessage *n
 
 	metricStatusOk := false
 
-	defer incrMetrics("WriteReplaceWarningRequest", &metricStatusOk)
+	defer incrMetrics("WriteReplaceWarningRequest", &metricStatusOk, syntaxCause)
 
 	abort := false
 
@@ -12631,7 +12632,7 @@ func handlerWriteReplaceWarningResponse(ran *context.AmfRan, successfulOutcome *
 
 	metricStatusOk := false
 
-	defer incrMetrics("WriteReplaceWarningResponse", &metricStatusOk)
+	defer incrMetrics("WriteReplaceWarningResponse", &metricStatusOk, syntaxCause)
 
 	abort := false
 
