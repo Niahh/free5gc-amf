@@ -2,23 +2,33 @@ package nas
 
 import (
 	"fmt"
-
 	amf_context "github.com/free5gc/amf/internal/context"
 	gmm_common "github.com/free5gc/amf/internal/gmm/common"
 	"github.com/free5gc/amf/internal/logger"
+	nas_metrics "github.com/free5gc/amf/internal/metrics/nas"
 	"github.com/free5gc/amf/internal/nas/nas_security"
 	"github.com/free5gc/nas"
 )
 
 func HandleNAS(ranUe *amf_context.RanUe, procedureCode int64, nasPdu []byte, initialMessage bool) {
+	isNasMsgRcv := false
+	metricCause := ""
+	nasMsg := nas.NewMessage()
+	// The closure here is for not having to add a deep copy func for the nas.Message type.
+	defer func() {
+		nas_metrics.IncrMetricsRcvNasMsg(nasMsg, &isNasMsgRcv, &metricCause)
+	}()
+
 	amfSelf := amf_context.GetSelf()
 
 	if ranUe == nil {
+		metricCause = nas_metrics.RAN_UE_NIL_ERR
 		logger.NasLog.Error("RanUe is nil")
 		return
 	}
 
 	if nasPdu == nil {
+		metricCause = nas_metrics.NAS_PDU_NIL_ERR
 		ranUe.Log.Error("nasPdu is nil")
 		return
 	}
@@ -40,9 +50,13 @@ func HandleNAS(ranUe *amf_context.RanUe, procedureCode int64, nasPdu []byte, ini
 
 	msg, integrityProtected, err := nas_security.Decode(ranUe.AmfUe, ranUe.Ran.AnType, nasPdu, initialMessage)
 	if err != nil {
+		metricCause = nas_metrics.DECODE_NAS_MSG_ERR
 		ranUe.AmfUe.NASLog.Errorln(err)
 		return
 	}
+
+	nasMsg = msg
+
 	ranUe.AmfUe.NasPduValue = nasPdu
 	ranUe.AmfUe.MacFailed = !integrityProtected
 
@@ -51,8 +65,11 @@ func HandleNAS(ranUe *amf_context.RanUe, procedureCode int64, nasPdu []byte, ini
 		ranUe.HoldingAmfUe = nil
 	}
 
+	isNasMsgRcv = true
+
 	if errDispatch := Dispatch(ranUe.AmfUe, ranUe.Ran.AnType, procedureCode, msg); errDispatch != nil {
 		ranUe.AmfUe.NASLog.Errorf("Handle NAS Error: %v", errDispatch)
+		isNasMsgRcv = false
 	}
 }
 

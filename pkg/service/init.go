@@ -11,6 +11,7 @@ import (
 
 	amf_context "github.com/free5gc/amf/internal/context"
 	"github.com/free5gc/amf/internal/logger"
+	"github.com/free5gc/amf/internal/metrics"
 	"github.com/free5gc/amf/internal/ngap"
 	ngap_message "github.com/free5gc/amf/internal/ngap/message"
 	ngap_service "github.com/free5gc/amf/internal/ngap/service"
@@ -44,6 +45,7 @@ type AmfApp struct {
 	processor *processor.Processor
 	consumer  *consumer.Consumer
 	sbiServer *sbi.Server
+	metricsServer *metrics.Server
 }
 
 func NewApp(ctx context.Context, cfg *factory.Config, tlsKeyLogPath string) (*AmfApp, error) {
@@ -70,6 +72,10 @@ func NewApp(ctx context.Context, cfg *factory.Config, tlsKeyLogPath string) (*Am
 	amf.amfCtx = amf_context.GetSelf()
 
 	if amf.sbiServer, err = sbi.NewServer(amf, tlsKeyLogPath); err != nil {
+		return nil, err
+	}
+
+	if amf.metricsServer, err = metrics.NewServer(cfg, tlsKeyLogPath); err != nil {
 		return nil, err
 	}
 
@@ -132,11 +138,15 @@ func (a *AmfApp) Start() {
 
 	sctpConfig := ngap_service.NewSctpConfig(factory.AmfConfig.GetSctpConfig())
 	ngap_service.Run(a.Context().NgapIpList, a.Context().NgapPort, ngapHandler, sctpConfig)
-	logger.InitLog.Infoln("Server started")
+	logger.InitLog.Infoln("Servers started")
 
 	a.wg.Add(1)
 	go a.listenShutdownEvent()
 
+	go func() {
+		a.metricsServer.Run(a.cfg, &a.wg)
+	}()
+	
 	var profile models.NrfNfManagementNfProfile
 	if profileTmp, err1 := a.Consumer().BuildNFInstance(a.Context()); err1 != nil {
 		logger.InitLog.Error("Build AMF Profile Error")
@@ -197,6 +207,9 @@ func (a *AmfApp) listenShutdownEvent() {
 func (a *AmfApp) CallServerStop() {
 	if a.sbiServer != nil {
 		a.sbiServer.Stop()
+	}
+	if a.metricsServer != nil {
+		a.metricsServer.Stop()
 	}
 }
 

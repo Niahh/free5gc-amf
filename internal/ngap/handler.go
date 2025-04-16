@@ -8,6 +8,7 @@ import (
 	"github.com/free5gc/amf/internal/context"
 	gmm_common "github.com/free5gc/amf/internal/gmm/common"
 	gmm_message "github.com/free5gc/amf/internal/gmm/message"
+	metrics "github.com/free5gc/amf/internal/metrics/ngap"
 	amf_nas "github.com/free5gc/amf/internal/nas"
 	"github.com/free5gc/amf/internal/nas/nas_security"
 	ngap_message "github.com/free5gc/amf/internal/ngap/message"
@@ -1348,11 +1349,15 @@ func handlePathSwitchRequestMain(ran *context.AmfRan,
 		}
 		ngap_message.SendPathSwitchRequestAcknowledge(ranUe, pduSessionResourceSwitchedList,
 			pduSessionResourceReleasedListPSAck, false, nil, nil, nil)
+		metrics.PathSwitchRequestAcknowledgeCounter.Inc()
 	} else if len(pduSessionResourceReleasedListPSFail.List) > 0 {
 		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value,
 			&pduSessionResourceReleasedListPSFail, nil)
+		// Can iterate through the list of pduSession and increment
+		metrics.PathSwitchRequestFailureCounter.Inc()
 	} else {
 		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value, nil, nil)
+		metrics.PathSwitchRequestFailureCounter.Inc()
 	}
 }
 
@@ -1565,6 +1570,7 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 	targetRanNodeId := ngapConvert.RanIdToModels(targetID.TargetRANNodeID.GlobalRANNodeID)
 	targetRan, ok := aMFSelf.AmfRanFindByRanID(targetRanNodeId)
 	if !ok {
+		// [todo] add metric for different amf
 		// handover between different AMF
 		sourceUe.Log.Warnf("Handover required : cannot find target Ran Node Id[%+v] in this AMF", targetRanNodeId)
 		sourceUe.Log.Error("Handover between different AMF has not been implemented yet")
@@ -1572,6 +1578,7 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 		// TODO: Send to T-AMF
 		// Described in (23.502 4.9.1.3.2) step 3.Namf_Communication_CreateUEContext Request
 	} else {
+		// [todo] add metric intra amf
 		// Handover in same AMF
 		sourceUe.HandOverType.Value = handoverType.Value
 		tai := ngapConvert.TaiToModels(targetID.TargetRANNodeID.SelectedTAI)
@@ -1584,6 +1591,7 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 
 		if pDUSessionResourceListHORqd != nil {
 			sourceUe.Log.Infof("Send HandoverRequiredTransfer to SMF")
+			// [todo] Add here a metric
 			for _, pDUSessionResourceHoItem := range pDUSessionResourceListHORqd.List {
 				pduSessionID := int32(pDUSessionResourceHoItem.PDUSessionID.Value)
 				smContext, okSmContextFindByPDUSessionID := amfUe.SmContextFindByPDUSessionID(pduSessionID)
