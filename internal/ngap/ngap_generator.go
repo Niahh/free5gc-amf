@@ -262,6 +262,7 @@ func generateHandler() {
 			"ngap_message \"github.com/free5gc/amf/internal/ngap/message\"",
 			"\"github.com/free5gc/ngap\"",
 			"\"github.com/free5gc/ngap/ngapType\"",
+			"ngap_metrics \"github.com/free5gc/amf/internal/metrics/ngap\"",
 		})
 
 	// generate handler functions
@@ -308,6 +309,14 @@ func generateHandler() {
 		fmt.Fprintln(fOut, "")
 		fmt.Fprintln(fOut, "var syntaxCause *ngapType.Cause")
 		fmt.Fprintln(fOut, "var iesCriticalityDiagnostics ngapType.CriticalityDiagnosticsIEList")
+
+		// Increase metric counter depending on the outcome of the handler generated function.
+		fmt.Fprintln(fOut, "")
+		fmt.Fprintln(fOut, "metricStatusOk := false")
+		fmt.Fprintln(fOut, "")
+		fmt.Fprintf(fOut, "defer ngap_metrics.IncrMetricsRcvMsg(\"%s\", &metricStatusOk, syntaxCause)\n", msgName)
+		fmt.Fprintln(fOut, "")
+
 		fmt.Fprintln(fOut, "abort := false")
 
 		// generate extract IEs code
@@ -523,6 +532,11 @@ syntaxCause = &ngapType.Cause{
 				mainFuncArgs = append(mainFuncArgs, ieInfo.GoVar+mayNil)
 			}
 		}
+
+		fmt.Fprintln(fOut, "")
+		fmt.Fprintln(fOut, "metricStatusOk = true")
+		fmt.Fprintln(fOut, "")
+
 		// Call main code of message handler
 		fmt.Fprintln(fOut, "")
 		fmt.Fprintf(fOut, "\t// func handle%sMain(%s) {\n", msgName, strings.Join(mainFuncArgDefs, ",\n\t//\t"))
