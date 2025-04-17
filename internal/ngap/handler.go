@@ -1351,6 +1351,7 @@ func handlePathSwitchRequestMain(ran *context.AmfRan,
 	} else if len(pduSessionResourceReleasedListPSFail.List) > 0 {
 		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value,
 			&pduSessionResourceReleasedListPSFail, nil)
+		// Can iterate through the list of pduSession and increment
 	} else {
 		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value, nil, nil)
 	}
@@ -1565,6 +1566,7 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 	targetRanNodeId := ngapConvert.RanIdToModels(targetID.TargetRANNodeID.GlobalRANNodeID)
 	targetRan, ok := aMFSelf.AmfRanFindByRanID(targetRanNodeId)
 	if !ok {
+		// [todo] add metric for different amf
 		// handover between different AMF
 		sourceUe.Log.Warnf("Handover required : cannot find target Ran Node Id[%+v] in this AMF", targetRanNodeId)
 		sourceUe.Log.Error("Handover between different AMF has not been implemented yet")
@@ -1572,6 +1574,7 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 		// TODO: Send to T-AMF
 		// Described in (23.502 4.9.1.3.2) step 3.Namf_Communication_CreateUEContext Request
 	} else {
+		// [todo] add metric intra amf
 		// Handover in same AMF
 		sourceUe.HandOverType.Value = handoverType.Value
 		tai := ngapConvert.TaiToModels(targetID.TargetRANNodeID.SelectedTAI)
@@ -1584,6 +1587,7 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 
 		if pDUSessionResourceListHORqd != nil {
 			sourceUe.Log.Infof("Send HandoverRequiredTransfer to SMF")
+			// [todo] Add here a metric
 			for _, pDUSessionResourceHoItem := range pDUSessionResourceListHORqd.List {
 				pduSessionID := int32(pDUSessionResourceHoItem.PDUSessionID.Value)
 				smContext, okSmContextFindByPDUSessionID := amfUe.SmContextFindByPDUSessionID(pduSessionID)
@@ -1772,7 +1776,7 @@ func handleUplinkRANConfigurationTransferMain(ran *context.AmfRan,
 	if sONConfigurationTransferUL != nil {
 		targetRanNodeID := ngapConvert.RanIdToModels(sONConfigurationTransferUL.TargetRANNodeID.GlobalRANNodeID)
 
-		if targetRanNodeID.GNbId != nil && targetRanNodeID.GNbId.GNBValue != "" {
+		if targetRanNodeID.GNbId.GNBValue != "" {
 			ran.Log.Tracef("targerRanID [%s]", targetRanNodeID.GNbId.GNBValue)
 		}
 
