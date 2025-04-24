@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net"
+	"os"
 	"testing"
 
 	"github.com/google/uuid"
@@ -12,6 +13,7 @@ import (
 
 	amf_context "github.com/free5gc/amf/internal/context"
 	"github.com/free5gc/amf/internal/logger"
+	"github.com/free5gc/amf/internal/metrics"
 	nastesting "github.com/free5gc/amf/internal/nas/testing"
 	ngaptesting "github.com/free5gc/amf/internal/ngap/testing"
 	"github.com/free5gc/amf/pkg/factory"
@@ -21,6 +23,7 @@ import (
 	"github.com/free5gc/ngap"
 	"github.com/free5gc/ngap/ngapType"
 	"github.com/free5gc/openapi/models"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func NewAmfRan(conn net.Conn) *amf_context.AmfRan {
@@ -308,6 +311,12 @@ func BuildInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string) 
 	}
 
 	return pdu
+}
+
+func TestMain(m *testing.M) {
+	prometheus.DefaultRegisterer = prometheus.NewRegistry()
+	metrics.Init(&factory.Config{})
+	os.Exit(m.Run())
 }
 
 func TestHandleInitialUEMessage(t *testing.T) {
