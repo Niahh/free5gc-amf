@@ -855,7 +855,7 @@ func (c *Config) GetMetricsCertKeyPath() string {
 }
 
 func (c *Config) GetMetricsNamespace() string {
-	if c.Configuration.Metrics != nil && c.Configuration.Metrics.Namespace != "" {
+	if c.Configuration != nil && c.Configuration.Metrics != nil && c.Configuration.Metrics.Namespace != "" {
 		return c.Configuration.Metrics.Namespace
 	}
 	return AmfMetricsDefaultNamespace

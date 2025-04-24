@@ -4,6 +4,10 @@
 package nas_test
 
 import (
+	"github.com/free5gc/amf/internal/metrics"
+	"github.com/free5gc/amf/pkg/factory"
+	"github.com/prometheus/client_golang/prometheus"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -20,6 +24,12 @@ import (
 	"github.com/free5gc/ngap/ngapType"
 	"github.com/free5gc/openapi/models"
 )
+
+func TestMain(m *testing.M) {
+	prometheus.DefaultRegisterer = prometheus.NewRegistry()
+	metrics.Init(&factory.Config{})
+	os.Exit(m.Run())
+}
 
 func FuzzHandleNAS(f *testing.F) {
 	amfSelf := amf_context.GetSelf()
