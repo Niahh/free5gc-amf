@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	nasMsgRcvCounterName = "nas_msg_received_total"
-	nasMsgRcvCounterDesc = "Total number of received NAS message by the AMF"
+	NasMsgRcvCounterName = "nas_msg_received_total"
+	NasMsgRcvCounterDesc = "Total number of received NAS message by the AMF"
 
-	nasMsgSentCounterName = "nas_msg_sent_total"
-	nasMsgSentCounterDesc = "Total number of NAS message sent by the AMF"
+	NasMsgSentCounterName = "nas_msg_sent_total"
+	NasMsgSentCounterDesc = "Total number of NAS message sent by the AMF"
 )
 
 // These values are tied to the metrics NAS message type
@@ -81,8 +81,8 @@ func GetNasHandlerMetrics(namespace string) []prometheus.Collector {
 	NasMsgRcvCounter = *prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: namespace,
-			Name:      nasMsgRcvCounterName,
-			Help:      nasMsgRcvCounterDesc,
+			Name:      NasMsgRcvCounterName,
+			Help:      NasMsgRcvCounterDesc,
 		},
 		[]string{"name", "status", "cause"},
 	)
@@ -92,8 +92,8 @@ func GetNasHandlerMetrics(namespace string) []prometheus.Collector {
 	NasMsgSentCounter = *prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: namespace,
-			Name:      nasMsgSentCounterName,
-			Help:      nasMsgSentCounterDesc,
+			Name:      NasMsgSentCounterName,
+			Help:      NasMsgSentCounterDesc,
 		},
 		[]string{"name", "status", "cause"},
 	)

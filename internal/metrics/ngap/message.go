@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	ngapMsgRcvCounterName = "ngap_msg_received_total"
-	ngapMsgRcvCounterDesc = "Total number of received NGAP message by the AMF "
+	NgapMsgRcvCounterName = "ngap_msg_received_total"
+	NgapMsgRcvCounterDesc = "Total number of received NGAP message by the AMF "
 
-	ngapMsgSentCounterName = "ngap_msg_sent_total"
-	ngapMsgSentCounterDesc = "Total number of NGAP message sent by the AMF "
+	NgapMsgSentCounterName = "ngap_msg_sent_total"
+	NgapMsgSentCounterDesc = "Total number of NGAP message sent by the AMF "
 )
 
 const (
@@ -85,8 +85,8 @@ func GetNgapHandlerMetrics(namespace string) []prometheus.Collector {
 	NgapMsgRcvCounter = *prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: namespace,
-			Name:      ngapMsgRcvCounterName,
-			Help:      ngapMsgRcvCounterDesc,
+			Name:      NgapMsgRcvCounterName,
+			Help:      NgapMsgRcvCounterDesc,
 		},
 		[]string{"name", "status", "cause"},
 	)
@@ -96,8 +96,8 @@ func GetNgapHandlerMetrics(namespace string) []prometheus.Collector {
 	NgapMsgSentCounter = *prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: namespace,
-			Name:      ngapMsgSentCounterName,
-			Help:      ngapMsgSentCounterDesc,
+			Name:      NgapMsgSentCounterName,
+			Help:      NgapMsgSentCounterDesc,
 		},
 		[]string{"name", "status", "cause"},
 	)
