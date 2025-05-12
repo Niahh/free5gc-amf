@@ -6,6 +6,7 @@ import (
 
 	amf_context "github.com/free5gc/amf/internal/context"
 	"github.com/free5gc/amf/internal/logger"
+	sbiMetrics "github.com/free5gc/amf/internal/metrics/sbi"
 	"github.com/free5gc/nas/nasMessage"
 	"github.com/free5gc/openapi"
 	Namf_Communication "github.com/free5gc/openapi/amf/Communication"
@@ -33,6 +34,7 @@ func (s *namfService) getComClient(uri string) *Namf_Communication.APIClient {
 
 	configuration := Namf_Communication.NewConfiguration()
 	configuration.SetBasePath(uri)
+	configuration.SetMetrics(sbiMetrics.SbiMetricHook)
 	client = Namf_Communication.NewAPIClient(configuration)
 
 	s.ComMu.RUnlock()

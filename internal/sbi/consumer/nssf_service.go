@@ -1,6 +1,7 @@
 package consumer
 
 import (
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"sync"
 
 	amf_context "github.com/free5gc/amf/internal/context"
@@ -30,6 +31,7 @@ func (s *nssfService) getNSSelectionClient(uri string) *Nnssf_NSSelection.APICli
 
 	configuration := Nnssf_NSSelection.NewConfiguration()
 	configuration.SetBasePath(uri)
+	configuration.SetMetrics(sbi.SbiMetricHook)
 	client = Nnssf_NSSelection.NewAPIClient(configuration)
 
 	s.NSSelectionMu.RUnlock()

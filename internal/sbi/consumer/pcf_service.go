@@ -1,6 +1,7 @@
 package consumer
 
 import (
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"regexp"
 	"sync"
 
@@ -33,6 +34,7 @@ func (s *npcfService) getAMPolicyClient(uri string) *Npcf_AMPolicy.APIClient {
 
 	configuration := Npcf_AMPolicy.NewConfiguration()
 	configuration.SetBasePath(uri)
+	configuration.SetMetrics(sbi.SbiMetricHook)
 	client = Npcf_AMPolicy.NewAPIClient(configuration)
 
 	s.AMPolicyMu.RUnlock()

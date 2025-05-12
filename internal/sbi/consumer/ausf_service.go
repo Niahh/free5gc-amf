@@ -3,6 +3,7 @@ package consumer
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"net/url"
 	"strconv"
 	"strings"
@@ -37,6 +38,7 @@ func (s *nausfService) getUEAuthenticationClient(uri string) *Nausf_UEAuthentica
 
 	configuration := Nausf_UEAuthentication.NewConfiguration()
 	configuration.SetBasePath(uri)
+	configuration.SetMetrics(sbi.SbiMetricHook)
 	client = Nausf_UEAuthentication.NewAPIClient(configuration)
 
 	s.UEAuthenticationMu.RUnlock()

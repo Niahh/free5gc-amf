@@ -4,6 +4,7 @@ package metrics
 import (
 	"github.com/free5gc/amf/internal/metrics/nas"
 	"github.com/free5gc/amf/internal/metrics/ngap"
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"github.com/free5gc/amf/pkg/factory"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
@@ -28,6 +29,8 @@ func Init(cfg *factory.Config) *prometheus.Registry {
 	// Append here the collector you want to register to the prometheus registry
 	amfMetrics = append(amfMetrics, nas.GetNasHandlerMetrics(namespace)...)
 	amfMetrics = append(amfMetrics, ngap.GetNgapHandlerMetrics(namespace)...)
+
+	amfMetrics = append(amfMetrics, sbi.GetSbiOutboundMetrics(namespace)...)
 
 	initMetric(amfMetrics, wrappedReg)
 

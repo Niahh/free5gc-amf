@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
+	"net/http"
 )
 
 const (
@@ -33,4 +34,13 @@ func GetCounterVecValue(counterName string, counter *prometheus.CounterVec, labe
 	}
 
 	return counterValue, nil
+}
+
+func FormatStatus(statusCode int) string {
+	code := http.StatusInternalServerError
+	if statusCode != 0 {
+		code = statusCode
+	}
+
+	return fmt.Sprintf("%d %s", code, http.StatusText(code))
 }

@@ -2,6 +2,7 @@ package consumer
 
 import (
 	"fmt"
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"sync"
 
 	amf_context "github.com/free5gc/amf/internal/context"
@@ -35,6 +36,7 @@ func (s *nudmService) getSubscriberDMngmntClients(uri string) *Nudm_SubscriberDa
 
 	configuration := Nudm_SubscriberDataManagement.NewConfiguration()
 	configuration.SetBasePath(uri)
+	configuration.SetMetrics(sbi.SbiMetricHook)
 	client = Nudm_SubscriberDataManagement.NewAPIClient(configuration)
 
 	s.SubscriberDMngmntMu.RUnlock()
