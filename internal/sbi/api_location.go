@@ -10,6 +10,7 @@
 package sbi
 
 import (
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -62,6 +63,7 @@ func (s *Server) HTTPProvideLocationInfo(c *gin.Context) {
 			Cause:  "SYSTEM_FAILURE",
 		}
 		logger.LocationLog.Errorf("Get Request Body error: %+v", err)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
@@ -75,6 +77,7 @@ func (s *Server) HTTPProvideLocationInfo(c *gin.Context) {
 			Detail: problemDetail,
 		}
 		logger.LocationLog.Errorln(problemDetail)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}

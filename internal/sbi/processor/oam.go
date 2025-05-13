@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"net/http"
 	"strconv"
 
@@ -42,6 +43,7 @@ func (p *Processor) HandleOAMRegisteredUEContext(c *gin.Context) {
 
 	ueContexts, problemDetails := p.OAMRegisteredUEContextProcedure(supi)
 	if problemDetails != nil {
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetails.Cause)
 		c.JSON(int(problemDetails.Status), problemDetails)
 	} else {
 		c.JSON(http.StatusOK, ueContexts)

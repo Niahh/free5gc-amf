@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"net/http"
 	"strconv"
 	"time"
@@ -245,6 +246,7 @@ func (p *Processor) HandleDeleteAMFEventSubscription(c *gin.Context) {
 
 	problemDetails := p.DeleteAMFEventSubscriptionProcedure(subscriptionID)
 	if problemDetails != nil {
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetails.Cause)
 		c.JSON(int(problemDetails.Status), problemDetails)
 	} else {
 		c.JSON(http.StatusOK, nil)
@@ -286,12 +288,14 @@ func (p *Processor) HandleModifyAMFEventSubscription(c *gin.Context,
 	if updatedEventSubscription != nil {
 		c.JSON(http.StatusOK, updatedEventSubscription)
 	} else if problemDetails != nil {
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetails.Cause)
 		c.JSON(int(problemDetails.Status), problemDetails)
 	} else {
 		problemDetails = &models.ProblemDetails{
 			Status: http.StatusInternalServerError,
 			Cause:  "UNSPECIFIED_NF_FAILURE",
 		}
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetails.Cause)
 		c.JSON(http.StatusInternalServerError, problemDetails)
 	}
 }

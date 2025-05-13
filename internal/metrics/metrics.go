@@ -31,6 +31,7 @@ func Init(cfg *factory.Config) *prometheus.Registry {
 	amfMetrics = append(amfMetrics, ngap.GetNgapHandlerMetrics(namespace)...)
 
 	amfMetrics = append(amfMetrics, sbi.GetSbiOutboundMetrics(namespace)...)
+	amfMetrics = append(amfMetrics, sbi.GetSbiInboundMetrics(namespace)...)
 
 	initMetric(amfMetrics, wrappedReg)
 

@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ func (p *Processor) HandleProvideLocationInfoRequest(c *gin.Context, requestLocI
 
 	provideLocInfo, problemDetails := p.ProvideLocationInfoProcedure(requestLocInfo, ueContextID)
 	if problemDetails != nil {
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetails.Cause)
 		c.JSON(int(problemDetails.Status), problemDetails)
 	} else {
 		c.JSON(http.StatusOK, provideLocInfo)

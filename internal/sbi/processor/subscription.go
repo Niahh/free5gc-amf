@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"net/http"
 	"reflect"
 
@@ -64,6 +65,7 @@ func (p *Processor) HandleAMFStatusChangeUnSubscribeRequest(c *gin.Context) {
 
 	problemDetails := p.AMFStatusChangeUnSubscribeProcedure(subscriptionID)
 	if problemDetails != nil {
+		c.Set("problemDetails", problemDetails.Cause)
 		c.JSON(int(problemDetails.Status), problemDetails)
 	} else {
 		c.Status(http.StatusNoContent)
@@ -96,6 +98,7 @@ func (p *Processor) HandleAMFStatusChangeSubscribeModify(c *gin.Context,
 	updatedSubscriptionData, problemDetails := p.
 		AMFStatusChangeSubscribeModifyProcedure(subscriptionID, updateSubscriptionData)
 	if problemDetails != nil {
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetails.Cause)
 		c.JSON(int(problemDetails.Status), problemDetails)
 		return
 	}

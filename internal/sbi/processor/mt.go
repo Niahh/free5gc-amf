@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ func (p *Processor) HandleProvideDomainSelectionInfoRequest(c *gin.Context) {
 	ueContextInfo, problemDetails := p.ProvideDomainSelectionInfoProcedure(ueContextID,
 		infoClassQuery, supportedFeaturesQuery)
 	if problemDetails != nil {
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetails.Cause)
 		c.JSON(int(problemDetails.Status), problemDetails)
 	} else {
 		c.JSON(http.StatusOK, ueContextInfo)

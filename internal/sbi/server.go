@@ -3,6 +3,7 @@ package sbi
 import (
 	"context"
 	"fmt"
+	"github.com/free5gc/amf/internal/sbi/middleware"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -66,6 +67,7 @@ func NewServer(amf ServerAmf, tlsKeyLogPath string) (*Server, error) {
 
 func newRouter(s *Server) *gin.Engine {
 	router := logger_util.NewGinWithLogrus(logger.GinLog)
+	router.Use(middleware.InboundMetrics())
 
 	amfHttpCallBackGroup := router.Group(factory.AmfCallbackResUriPrefix)
 	amfHttpCallBackRoutes := s.getHttpCallBackRoutes()

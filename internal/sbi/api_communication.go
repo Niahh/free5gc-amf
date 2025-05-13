@@ -2,6 +2,7 @@ package sbi
 
 import (
 	"fmt"
+	"github.com/free5gc/amf/internal/metrics/sbi"
 	"net/http"
 	"strings"
 
@@ -143,6 +144,7 @@ func (s *Server) HTTPAMFStatusChangeSubscribeModify(c *gin.Context) {
 			Detail: err.Error(),
 			Cause:  "SYSTEM_FAILURE",
 		}
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail.Cause)
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
@@ -156,6 +158,7 @@ func (s *Server) HTTPAMFStatusChangeSubscribeModify(c *gin.Context) {
 			Detail: problemDetail,
 		}
 		logger.CommLog.Errorln(problemDetail)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
@@ -180,6 +183,7 @@ func (s *Server) HTTPCreateUEContext(c *gin.Context) {
 			Detail: err.Error(),
 			Cause:  "SYSTEM_FAILURE",
 		}
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
@@ -203,6 +207,7 @@ func (s *Server) HTTPCreateUEContext(c *gin.Context) {
 			Detail: problemDetail,
 		}
 		logger.CommLog.Errorln(problemDetail)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
@@ -222,6 +227,7 @@ func (s *Server) HTTPEBIAssignment(c *gin.Context) {
 			Cause:  "SYSTEM_FAILURE",
 		}
 		logger.CommLog.Errorf("Get Request Body error: %+v", err)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
@@ -235,6 +241,7 @@ func (s *Server) HTTPEBIAssignment(c *gin.Context) {
 			Detail: problemDetail,
 		}
 		logger.CommLog.Errorln(problemDetail)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
@@ -254,6 +261,7 @@ func (s *Server) HTTPRegistrationStatusUpdate(c *gin.Context) {
 			Detail: err.Error(),
 			Cause:  "SYSTEM_FAILURE",
 		}
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
@@ -267,6 +275,7 @@ func (s *Server) HTTPRegistrationStatusUpdate(c *gin.Context) {
 			Detail: problemDetail,
 		}
 		logger.CommLog.Errorln(problemDetail)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
@@ -286,6 +295,7 @@ func (s *Server) HTTPReleaseUEContext(c *gin.Context) {
 			Detail: err.Error(),
 			Cause:  "SYSTEM_FAILURE",
 		}
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
@@ -299,6 +309,7 @@ func (s *Server) HTTPReleaseUEContext(c *gin.Context) {
 			Detail: problemDetail,
 		}
 		logger.CommLog.Errorln(problemDetail)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
@@ -319,6 +330,7 @@ func (s *Server) HTTPUEContextTransfer(c *gin.Context) {
 			Detail: err.Error(),
 			Cause:  "SYSTEM_FAILURE",
 		}
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
@@ -340,6 +352,7 @@ func (s *Server) HTTPUEContextTransfer(c *gin.Context) {
 			Detail: problemDetail,
 		}
 		logger.CommLog.Errorln(problemDetail)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
@@ -371,6 +384,7 @@ func (s *Server) HTTPN1N2MessageTransfer(c *gin.Context) {
 			Cause:  "SYSTEM_FAILURE",
 		}
 		logger.CommLog.Errorf("Get Request Body error: %+v", err)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusInternalServerError, problemDetail)
 		return
 	}
@@ -394,6 +408,7 @@ func (s *Server) HTTPN1N2MessageTransfer(c *gin.Context) {
 			Detail: problemDetail,
 		}
 		logger.CommLog.Errorln(problemDetail)
+		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetail)
 		c.JSON(http.StatusBadRequest, rsp)
 		return
 	}
