@@ -5,6 +5,7 @@ import (
 	gmm_common "github.com/free5gc/amf/internal/gmm/common"
 	gmm_message "github.com/free5gc/amf/internal/gmm/message"
 	"github.com/free5gc/amf/internal/logger"
+	business_metrics "github.com/free5gc/amf/internal/metrics/business"
 	ngap_message "github.com/free5gc/amf/internal/ngap/message"
 	"github.com/free5gc/amf/internal/sbi/consumer"
 	"github.com/free5gc/nas"
@@ -13,6 +14,7 @@ import (
 	"github.com/free5gc/ngap/ngapType"
 	"github.com/free5gc/openapi/models"
 	"github.com/free5gc/util/fsm"
+	"time"
 )
 
 func DeRegistered(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
@@ -60,18 +62,20 @@ func DeRegistered(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 }
 
 func Registered(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
+	var accessType = args[ArgAccessType].(models.AccessType)
 	switch event {
 	case fsm.EntryEvent:
+		business_metrics.IncrGmmStateGauge(string(accessType), string(state.Current()))
 		// clear stored registration request data for this registration
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
-		accessType := args[ArgAccessType].(models.AccessType)
+		amfUe.GmmStateEnterTime = time.Now()
 		amfUe.ClearRegistrationRequestData(accessType)
 		amfUe.GmmLog.Debugln("EntryEvent at GMM State[Registered]")
 	case GmmMessageEvent:
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
 		procedureCode := args[ArgProcedureCode].(int64)
 		gmmMessage := args[ArgNASMessage].(*nas.GmmMessage)
-		accessType := args[ArgAccessType].(models.AccessType)
+		accessType = args[ArgAccessType].(models.AccessType)
 		amfUe.GmmLog.Debugln("GmmMessageEvent at GMM State[Registered]")
 		switch gmmMessage.GetMessageType() {
 		// Mobility Registration update / Periodic Registration update
@@ -124,7 +128,9 @@ func Registered(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 	case InitDeregistrationEvent:
 		logger.GmmLog.Debugln(event)
 	case fsm.ExitEvent:
+		entryTime := args[ArgAmfUe].(*context.AmfUe).GmmStateEnterTime
 		logger.GmmLog.Debugln(event)
+		business_metrics.DecrGmmStateGauge(string(accessType), string(state.Current()), entryTime)
 	default:
 		logger.GmmLog.Errorf("Unknown event [%+v]", event)
 	}
@@ -132,14 +138,16 @@ func Registered(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 
 func Authentication(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 	var amfUe *context.AmfUe
+	var accessType = args[ArgAccessType].(models.AccessType)
 	switch event {
 	case fsm.EntryEvent:
+		business_metrics.IncrGmmStateGauge(string(accessType), string(state.Current()))
 		amfUe = args[ArgAmfUe].(*context.AmfUe)
+		amfUe.GmmStateEnterTime = time.Now()
 		amfUe.GmmLog.Debugln("EntryEvent at GMM State[Authentication]")
 		fallthrough
 	case AuthRestartEvent:
 		amfUe = args[ArgAmfUe].(*context.AmfUe)
-		accessType := args[ArgAccessType].(models.AccessType)
 		amfUe.GmmLog.Debugln("AuthRestartEvent at GMM State[Authentication]")
 
 		pass, err := AuthenticationProcedure(amfUe, accessType)
@@ -162,7 +170,7 @@ func Authentication(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 	case GmmMessageEvent:
 		amfUe = args[ArgAmfUe].(*context.AmfUe)
 		gmmMessage := args[ArgNASMessage].(*nas.GmmMessage)
-		accessType := args[ArgAccessType].(models.AccessType)
+		accessType = args[ArgAccessType].(models.AccessType)
 		amfUe.GmmLog.Debugln("GmmMessageEvent at GMM State[Authentication]")
 
 		switch gmmMessage.GetMessageType() {
@@ -206,7 +214,7 @@ func Authentication(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 		logger.GmmLog.Debugln(event)
 	case AuthErrorEvent:
 		amfUe = args[ArgAmfUe].(*context.AmfUe)
-		accessType := args[ArgAccessType].(models.AccessType)
+		accessType = args[ArgAccessType].(models.AccessType)
 		logger.GmmLog.Debugln(event)
 		if err := HandleAuthenticationError(amfUe, accessType); err != nil {
 			logger.GmmLog.Errorln(err)
@@ -215,7 +223,7 @@ func Authentication(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 		logger.GmmLog.Debugln(event)
 		logger.GmmLog.Warnln("Reject authentication")
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
-		accessType := args[ArgAccessType].(models.AccessType)
+		accessType = args[ArgAccessType].(models.AccessType)
 		if amfUe.RanUe[accessType] != nil {
 			ngap_message.SendUEContextReleaseCommand(amfUe.RanUe[accessType], context.UeContextN2NormalRelease,
 				ngapType.CausePresentNas, ngapType.CauseNasPresentAuthenticationFailure)
@@ -232,16 +240,19 @@ func Authentication(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 		amfUe.AuthenticationCtx = nil
 		amfUe.AuthFailureCauseSynchFailureTimes = 0
 		amfUe.IdentityRequestSendTimes = 0
+		business_metrics.DecrGmmStateGauge(string(accessType), string(state.Current()), amfUe.GmmStateEnterTime)
 	default:
 		logger.GmmLog.Errorf("Unknown event [%+v]", event)
 	}
 }
 
 func SecurityMode(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
+	var accessType = args[ArgAccessType].(models.AccessType)
 	switch event {
 	case fsm.EntryEvent:
+		business_metrics.IncrGmmStateGauge(string(accessType), string(state.Current()))
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
-		accessType := args[ArgAccessType].(models.AccessType)
+		amfUe.GmmStateEnterTime = time.Now()
 		// set log information
 		amfUe.UpdateLogFields(accessType)
 
@@ -255,6 +266,7 @@ func SecurityMode(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 			}, logger.GmmLog); err != nil {
 				logger.GmmLog.Errorln(err)
 			}
+
 		} else {
 			eapSuccess := args[ArgEAPSuccess].(bool)
 			eapMessage := args[ArgEAPMessage].(string)
@@ -281,7 +293,6 @@ func SecurityMode(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
 		procedureCode := args[ArgProcedureCode].(int64)
 		gmmMessage := args[ArgNASMessage].(*nas.GmmMessage)
-		accessType := args[ArgAccessType].(models.AccessType)
 		amfUe.GmmLog.Debugln("GmmMessageEvent to GMM State[SecurityMode]")
 		switch gmmMessage.GetMessageType() {
 		case nas.MsgTypeSecurityModeComplete:
@@ -313,6 +324,8 @@ func SecurityMode(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 		logger.GmmLog.Debugln(event)
 	case fsm.ExitEvent:
 		logger.GmmLog.Debugln(event)
+		entryTime := args[ArgAmfUe].(*context.AmfUe).GmmStateEnterTime
+		business_metrics.DecrGmmStateGauge(string(accessType), string(state.Current()), entryTime)
 		return
 	default:
 		logger.GmmLog.Errorf("Unknown event [%+v]", event)
@@ -320,11 +333,13 @@ func SecurityMode(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 }
 
 func ContextSetup(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
+	var accessType = args[ArgAccessType].(models.AccessType)
 	switch event {
 	case fsm.EntryEvent:
+		business_metrics.IncrGmmStateGauge(string(accessType), string(state.Current()))
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
+		amfUe.GmmStateEnterTime = time.Now()
 		gmmMessage := args[ArgNASMessage]
-		accessType := args[ArgAccessType].(models.AccessType)
 		amfUe.GmmLog.Debugln("EntryEvent at GMM State[ContextSetup]")
 
 		switch message := gmmMessage.(type) {
@@ -366,7 +381,6 @@ func ContextSetup(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 	case GmmMessageEvent:
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
 		gmmMessage := args[ArgNASMessage].(*nas.GmmMessage)
-		accessType := args[ArgAccessType].(models.AccessType)
 		amfUe.GmmLog.Debugln("GmmMessageEvent at GMM State[ContextSetup]")
 		switch gmmMessage.GetMessageType() {
 		case nas.MsgTypeIdentityResponse:
@@ -417,7 +431,6 @@ func ContextSetup(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 	case ContextSetupFailEvent:
 		logger.GmmLog.Debugln(event)
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
-		accessType := args[ArgAccessType].(models.AccessType)
 		if amfUe.UeCmRegistered[accessType] {
 			problemDetails, err := consumer.GetConsumer().UeCmDeregistration(amfUe, accessType)
 			if problemDetails != nil {
@@ -430,17 +443,20 @@ func ContextSetup(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
 		}
 	case fsm.ExitEvent:
 		logger.GmmLog.Debugln(event)
+		entryTime := args[ArgAmfUe].(*context.AmfUe).GmmStateEnterTime
+		business_metrics.DecrGmmStateGauge(string(accessType), string(state.Current()), entryTime)
 	default:
 		logger.GmmLog.Errorf("Unknown event [%+v]", event)
 	}
 }
 
 func DeregisteredInitiated(state *fsm.State, event fsm.EventType, args fsm.ArgsType) {
+	var accessType = args[ArgAccessType].(models.AccessType)
 	switch event {
 	case fsm.EntryEvent:
+		business_metrics.IncrGmmStateGauge(string(accessType), string(state.Current()))
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
 		gmmMessage := args[ArgNASMessage].(*nas.GmmMessage)
-		accessType := args[ArgAccessType].(models.AccessType)
 		amfUe.GmmLog.Debugln("EntryEvent at GMM State[DeregisteredInitiated]")
 		if err := HandleDeregistrationRequest(amfUe, accessType,
 			gmmMessage.DeregistrationRequestUEOriginatingDeregistration); err != nil {
@@ -449,7 +465,6 @@ func DeregisteredInitiated(state *fsm.State, event fsm.EventType, args fsm.ArgsT
 	case GmmMessageEvent:
 		amfUe := args[ArgAmfUe].(*context.AmfUe)
 		gmmMessage := args[ArgNASMessage].(*nas.GmmMessage)
-		accessType := args[ArgAccessType].(models.AccessType)
 		amfUe.GmmLog.Debugln("GmmMessageEvent at GMM State[DeregisteredInitiated]")
 		switch gmmMessage.GetMessageType() {
 		case nas.MsgTypeDeregistrationAcceptUETerminatedDeregistration:
@@ -464,6 +479,8 @@ func DeregisteredInitiated(state *fsm.State, event fsm.EventType, args fsm.ArgsT
 	case DeregistrationAcceptEvent:
 		logger.GmmLog.Debugln(event)
 	case fsm.ExitEvent:
+		entryTime := args[ArgAmfUe].(*context.AmfUe).GmmStateEnterTime
+		business_metrics.DecrGmmStateGauge(string(accessType), string(state.Current()), entryTime)
 		logger.GmmLog.Debugln(event)
 	default:
 		logger.GmmLog.Errorf("Unknown event [%+v]", event)

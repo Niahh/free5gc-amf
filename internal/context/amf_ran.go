@@ -2,6 +2,7 @@ package context
 
 import (
 	"fmt"
+	business_metrics "github.com/free5gc/amf/internal/metrics/business"
 	"net"
 	"sync"
 
@@ -76,6 +77,7 @@ func (ran *AmfRan) NewRanUe(ranUeNgapID int64) (*RanUe, error) {
 	}
 	self.RanUePool.Store(ranUe.AmfUeNgapId, &ranUe)
 	ranUe.Log.Infof("New RanUe [RanUeNgapID:%d][AmfUeNgapID:%d]", ranUe.RanUeNgapId, ranUe.AmfUeNgapId)
+	business_metrics.IncrUeCmIdleStateGauge(ran.AnType)
 	return &ranUe, nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	business_metrics "github.com/free5gc/amf/internal/metrics/business"
 	"regexp"
 	"sync"
 	"time"
@@ -194,9 +195,10 @@ type AmfUe struct {
 	Lock                   sync.Mutex // Update context to prevent race condition
 
 	// logger
-	NASLog      *logrus.Entry
-	GmmLog      *logrus.Entry
-	ProducerLog *logrus.Entry
+	NASLog            *logrus.Entry
+	GmmLog            *logrus.Entry
+	ProducerLog       *logrus.Entry
+	GmmStateEnterTime time.Time
 }
 
 type AmfUeEventSubscription struct {
@@ -320,6 +322,7 @@ func (ue *AmfUe) Remove() {
 	if len(ue.Supi) > 0 {
 		GetSelf().UePool.Delete(ue.Supi)
 	}
+
 	logger.CtxLog.Infof("AmfUe[%s] is removed", ue.Supi)
 }
 
@@ -327,12 +330,16 @@ func (ue *AmfUe) DetachRanUe(anType models.AccessType) {
 	if ue == nil {
 		return
 	}
+	business_metrics.IncrUeCmIdleStateGauge(anType)
+	business_metrics.DecrUeCmConnectedStateGauge(anType)
 	delete(ue.RanUe, anType)
 	ue.UpdateLogFields(anType)
 }
 
 // Don't call this function directly. Use gmm_common.AttachRanUeToAmfUeAndReleaseOldIfAny().
 func (ue *AmfUe) AttachRanUe(ranUe *RanUe) {
+	business_metrics.IncrUeCmConnectedStateGauge(ranUe.Ran.AnType)
+	business_metrics.DecrUeCmIdleStateGauge(ranUe.Ran.AnType)
 	ue.RanUe[ranUe.Ran.AnType] = ranUe
 	ranUe.AmfUe = ue
 	ue.UpdateLogFields(ranUe.Ran.AnType)

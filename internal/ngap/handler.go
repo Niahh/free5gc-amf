@@ -3,11 +3,12 @@ package ngap
 import (
 	"encoding/hex"
 	"fmt"
-	"strconv"
-
 	"github.com/free5gc/amf/internal/context"
 	gmm_common "github.com/free5gc/amf/internal/gmm/common"
 	gmm_message "github.com/free5gc/amf/internal/gmm/message"
+	business_metrics "github.com/free5gc/amf/internal/metrics/business"
+	"github.com/free5gc/amf/internal/metrics/ngap"
+	"github.com/free5gc/amf/internal/metrics/utils"
 	amf_nas "github.com/free5gc/amf/internal/nas"
 	"github.com/free5gc/amf/internal/nas/nas_security"
 	ngap_message "github.com/free5gc/amf/internal/ngap/message"
@@ -20,6 +21,8 @@ import (
 	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
 	"github.com/free5gc/openapi/models"
+	"strconv"
+	"time"
 )
 
 func handleNGSetupRequestMain(ran *context.AmfRan,
@@ -1189,6 +1192,9 @@ func handleHandoverNotifyMain(ran *context.AmfRan,
 	}
 	amfUe := targetUe.AmfUe
 	if amfUe == nil {
+		business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_NGAP_VALUE,
+			business_metrics.HANDOVER_EVENT_FAILURE_VALUE, business_metrics.HANDOVER_AMF_UE_MISSING_ERR,
+			targetUe.HandOverStartTime)
 		ran.Log.Error("AmfUe is nil")
 		return
 	}
@@ -1197,6 +1203,9 @@ func handleHandoverNotifyMain(ran *context.AmfRan,
 		// TODO: Send to S-AMF
 		// Desciibed in (23.502 4.9.1.3.3) [conditional] 6a.Namf_Communication_N2InfoNotify.
 		ran.Log.Error("N2 Handover between AMF has not been implemented yet")
+		business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_NGAP_VALUE,
+			business_metrics.HANDOVER_EVENT_FAILURE_VALUE,
+			business_metrics.HANDOVER_NOT_YET_IMPLEMENT_N2_HANDOVER_BETWEEN_AMF, targetUe.HandOverStartTime)
 	} else {
 		ran.Log.Info("Handle Handover notification Finshed")
 		for _, pduSessionID := range targetUe.SuccessPduSessionId {
@@ -1212,6 +1221,9 @@ func handleHandoverNotifyMain(ran *context.AmfRan,
 			}
 		}
 
+		business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_NGAP_VALUE,
+			business_metrics.HANDOVER_EVENT_SUCCESS_VALUE,
+			business_metrics.EMPTY_CAUSE, targetUe.HandOverStartTime)
 		gmm_common.AttachRanUeToAmfUeAndReleaseOldHandover(amfUe, sourceUe, targetUe)
 	}
 
@@ -1227,10 +1239,16 @@ func handlePathSwitchRequestMain(ran *context.AmfRan,
 	pduSessionResourceToBeSwitchedInDLList *ngapType.PDUSessionResourceToBeSwitchedDLList,
 	pduSessionResourceFailedToSetupList *ngapType.PDUSessionResourceFailedToSetupListPSReq,
 ) {
+	xnHandoverStartTime := time.Now()
+	business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_XN_VALUE,
+		business_metrics.HANDOVER_EVENT_ATTEMPT_VALUE, business_metrics.EMPTY_CAUSE, xnHandoverStartTime)
+
 	ranUe := context.GetSelf().RanUeFindByAmfUeNgapID(sourceAMFUENGAPID.Value)
 	if ranUe == nil {
 		ran.Log.Errorf("Cannot find UE from sourceAMfUeNgapID[%d]", sourceAMFUENGAPID.Value)
-		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value, nil, nil)
+		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value,
+			nil, nil, business_metrics.HANDOVER_RAN_UE_MISSING_ERR,
+			xnHandoverStartTime)
 		return
 	}
 
@@ -1239,7 +1257,9 @@ func handlePathSwitchRequestMain(ran *context.AmfRan,
 	amfUe := ranUe.AmfUe
 	if amfUe == nil {
 		ranUe.Log.Error("AmfUe is nil")
-		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value, nil, nil)
+		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value,
+			nil, nil, business_metrics.HANDOVER_AMF_UE_MISSING_ERR,
+			xnHandoverStartTime)
 		return
 	}
 
@@ -1248,7 +1268,9 @@ func handlePathSwitchRequestMain(ran *context.AmfRan,
 		amfUe.UpdateNH()
 	} else {
 		ranUe.Log.Errorf("No Security Context : SUPI[%s]", amfUe.Supi)
-		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value, nil, nil)
+		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value,
+			nil, nil, business_metrics.HANDOVER_SECURITY_CONTEXT_MISSING_ERR,
+			xnHandoverStartTime)
 		return
 	}
 
@@ -1344,16 +1366,23 @@ func handlePathSwitchRequestMain(ran *context.AmfRan,
 		err := ranUe.SwitchToRan(ran, rANUENGAPID.Value)
 		if err != nil {
 			ranUe.Log.Error(err.Error())
+			business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_XN_VALUE,
+				business_metrics.HANDOVER_EVENT_FAILURE_VALUE, business_metrics.HANDOVER_SWITCH_RAN_ERR,
+				xnHandoverStartTime)
 			return
 		}
 		ngap_message.SendPathSwitchRequestAcknowledge(ranUe, pduSessionResourceSwitchedList,
-			pduSessionResourceReleasedListPSAck, false, nil, nil, nil)
+			pduSessionResourceReleasedListPSAck, false, nil, nil, nil, xnHandoverStartTime)
 	} else if len(pduSessionResourceReleasedListPSFail.List) > 0 {
 		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value,
-			&pduSessionResourceReleasedListPSFail, nil)
+			&pduSessionResourceReleasedListPSFail, nil, business_metrics.HANDOVER_PDU_SESSION_RES_REL_LIST_ERR,
+			xnHandoverStartTime)
 		// Can iterate through the list of pduSession and increment
 	} else {
-		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value, nil, nil)
+		// TODO: change the cause error
+		ngap_message.SendPathSwitchRequestFailure(ran, sourceAMFUENGAPID.Value, rANUENGAPID.Value,
+			nil, nil, business_metrics.EMPTY_CAUSE,
+			xnHandoverStartTime)
 	}
 }
 
@@ -1365,11 +1394,24 @@ func handleHandoverRequestAcknowledgeMain(ran *context.AmfRan,
 	targetToSourceTransparentContainer *ngapType.TargetToSourceTransparentContainer,
 	criticalityDiagnostics *ngapType.CriticalityDiagnostics,
 ) {
+
+	hoFailCause := ""
+
+	defer func(hoFailCause *string) {
+		if utils.ReadStringPtr(hoFailCause) != "" {
+			business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_NGAP_VALUE,
+				business_metrics.HANDOVER_EVENT_FAILURE_VALUE, utils.ReadStringPtr(hoFailCause),
+				targetUe.HandOverStartTime)
+		}
+
+	}(&hoFailCause)
+
 	if criticalityDiagnostics != nil {
 		printCriticalityDiagnostics(ran, criticalityDiagnostics)
 	}
 
 	if targetUe == nil {
+		hoFailCause = business_metrics.HANDOVER_TARGET_UE_MISSING_ERR
 		ran.Log.Errorf("Target Ue is missing")
 		return
 	}
@@ -1382,6 +1424,7 @@ func handleHandoverRequestAcknowledgeMain(ran *context.AmfRan,
 
 	amfUe := targetUe.AmfUe
 	if amfUe == nil {
+		hoFailCause = business_metrics.HANDOVER_TARGET_UE_MISSING_ERR
 		targetUe.Log.Error("amfUe is nil")
 		return
 	}
@@ -1463,6 +1506,7 @@ func handleHandoverRequestAcknowledgeMain(ran *context.AmfRan,
 				},
 			}
 			ngap_message.SendHandoverPreparationFailure(sourceUe, *cause, nil)
+			hoFailCause = ngap.GetCauseErrorStr(cause)
 			return
 		}
 		ngap_message.SendHandoverCommand(sourceUe, pduSessionResourceHandoverList, pduSessionResourceToReleaseList,
@@ -1475,6 +1519,9 @@ func handleHandoverFailureMain(ran *context.AmfRan,
 	cause *ngapType.Cause,
 	criticalityDiagnostics *ngapType.CriticalityDiagnostics,
 ) {
+	business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_NGAP_VALUE,
+		business_metrics.HANDOVER_EVENT_FAILURE_VALUE, ngap.GetCauseErrorStr(cause), targetUe.HandOverStartTime)
+
 	causePresent := ngapType.CausePresentRadioNetwork
 	causeValue := ngapType.CauseRadioNetworkPresentHoFailureInTarget5GCNgranNodeOrTargetSystem
 	if cause != nil {
@@ -1538,16 +1585,34 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 	pDUSessionResourceListHORqd *ngapType.PDUSessionResourceListHORqd,
 	sourceToTargetTransparentContainer *ngapType.SourceToTargetTransparentContainer,
 ) {
+	sourceUe.HandOverStartTime = time.Now()
+	hoFailCause := ""
+
+	business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_NGAP_VALUE,
+		business_metrics.HANDOVER_EVENT_ATTEMPT_VALUE, business_metrics.EMPTY_CAUSE, sourceUe.HandOverStartTime)
+
+	defer func(hoFailCause *string) {
+		if utils.ReadStringPtr(hoFailCause) != "" {
+			business_metrics.IncrHoEventCounter(business_metrics.HANDOVER_TYPE_NGAP_VALUE,
+				business_metrics.HANDOVER_EVENT_FAILURE_VALUE, utils.ReadStringPtr(hoFailCause), sourceUe.HandOverStartTime)
+		}
+
+	}(&hoFailCause)
+
 	amfUe := sourceUe.AmfUe
+
 	if amfUe == nil {
+		hoFailCause = business_metrics.HANDOVER_AMF_UE_MISSING_ERR
 		ran.Log.Error("Cannot find amfUE from sourceUE")
 		return
 	}
 
 	if targetID.Present != ngapType.TargetIDPresentTargetRANNodeID {
+		hoFailCause = business_metrics.HANDOVER_TARGET_ID_NOT_SUPPORTED_ERR
 		ran.Log.Errorf("targetID type[%d] is not supported", targetID.Present)
 		return
 	}
+
 	amfUe.SetOnGoing(sourceUe.Ran.AnType, &context.OnGoing{
 		Procedure: context.OnGoingProcedureN2Handover,
 	})
@@ -1559,6 +1624,7 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 				Value: ngapType.CauseNasPresentAuthenticationFailure,
 			},
 		}
+		hoFailCause = ngap.GetCauseErrorStr(cause)
 		ngap_message.SendHandoverPreparationFailure(sourceUe, *cause, nil)
 		return
 	}
@@ -1570,11 +1636,11 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 		// handover between different AMF
 		sourceUe.Log.Warnf("Handover required : cannot find target Ran Node Id[%+v] in this AMF", targetRanNodeId)
 		sourceUe.Log.Error("Handover between different AMF has not been implemented yet")
+		hoFailCause = business_metrics.HANDOVER_BETWEEN_DIFFERENT_AMF_NOT_SUPPORTED
 		return
 		// TODO: Send to T-AMF
 		// Described in (23.502 4.9.1.3.2) step 3.Namf_Communication_CreateUEContext Request
 	} else {
-		// [todo] add metric intra amf
 		// Handover in same AMF
 		sourceUe.HandOverType.Value = handoverType.Value
 		tai := ngapConvert.TaiToModels(targetID.TargetRANNodeID.SelectedTAI)
@@ -1587,7 +1653,6 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 
 		if pDUSessionResourceListHORqd != nil {
 			sourceUe.Log.Infof("Send HandoverRequiredTransfer to SMF")
-			// [todo] Add here a metric
 			for _, pDUSessionResourceHoItem := range pDUSessionResourceListHORqd.List {
 				pduSessionID := int32(pDUSessionResourceHoItem.PDUSessionID.Value)
 				smContext, okSmContextFindByPDUSessionID := amfUe.SmContextFindByPDUSessionID(pduSessionID)
@@ -1619,6 +1684,7 @@ func handleHandoverRequiredMain(ran *context.AmfRan,
 					Value: ngapType.CauseRadioNetworkPresentHoFailureInTarget5GCNgranNodeOrTargetSystem,
 				},
 			}
+			hoFailCause = ngap.GetCauseErrorStr(cause)
 			ngap_message.SendHandoverPreparationFailure(sourceUe, *cause, nil)
 			return
 		}

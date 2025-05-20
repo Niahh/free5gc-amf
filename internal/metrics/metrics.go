@@ -2,6 +2,7 @@
 package metrics
 
 import (
+	"github.com/free5gc/amf/internal/metrics/business"
 	"github.com/free5gc/amf/internal/metrics/nas"
 	"github.com/free5gc/amf/internal/metrics/ngap"
 	"github.com/free5gc/amf/internal/metrics/sbi"
@@ -32,6 +33,11 @@ func Init(cfg *factory.Config) *prometheus.Registry {
 
 	amfMetrics = append(amfMetrics, sbi.GetSbiOutboundMetrics(namespace)...)
 	amfMetrics = append(amfMetrics, sbi.GetSbiInboundMetrics(namespace)...)
+
+	amfMetrics = append(amfMetrics, businness.GetGMMStatesHandlerMetrics(namespace)...)
+	amfMetrics = append(amfMetrics, businness.GetUECMHandlerMetrics(namespace)...)
+	amfMetrics = append(amfMetrics, businness.GetHandoverHandlerMetrics(namespace)...)
+	amfMetrics = append(amfMetrics, businness.GetPDUHandlerMetrics(namespace)...)
 
 	initMetric(amfMetrics, wrappedReg)
 

@@ -57,10 +57,12 @@ func IncrMetricsRcvMsg(msgType string, metricStatusSuccess *bool, syntaxCause *n
 func IncrMetricsSentMsg(msgType string, metricStatusSuccess *bool, syntaxCause ngapType.Cause, otherCause *string) {
 
 	msgCause := ""
+	causeErrStr := GetCauseErrorStr(&syntaxCause)
 
-	if syntaxCause.Present != 0 {
-		msgCause = GetCauseErrorStr(&syntaxCause)
-	} else if otherCause != nil {
+	switch {
+	case causeErrStr != "unknown ngapType.Cause":
+		msgCause = causeErrStr
+	case otherCause != nil:
 		msgCause = *otherCause
 	}
 
